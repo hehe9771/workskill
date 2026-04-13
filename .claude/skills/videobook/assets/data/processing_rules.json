@@ -1,0 +1,21 @@
+{
+  "chapter_detection_patterns": [
+    "第[0-9一二三四五六七八九十]+[章节]",
+    "[0-9]+\\..*",
+    "[0-9]+\\.[0-9]+\\s+.*",
+    "^\\s*[IVX]+\\.\\s+.*",
+    "^\\s*[A-Z]+\\s+.*"
+  ],
+  "chart_generation_rules": {
+    "flowchart_keywords": ["流程", "过程", "步骤", "顺序", "阶段"],
+    "sequence_keywords": ["交互", "对话", "通信", "消息"],
+    "class_keywords": ["类", "对象", "属性", "方法", "继承"],
+    "state_keywords": ["状态", "转换", "事件", "条件"],
+    "er_keywords": ["实体", "关系", "属性", "主键"]
+  },
+  "text_processing_options": {
+    "min_chapter_length": 100,
+    "max_chapter_length": 2000,
+    "paragraph_separation_threshold": 3
+  }
+}
