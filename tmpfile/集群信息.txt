@@ -1,0 +1,96 @@
+私有仓库地址 ：  123.56.230.69:8001 
+使用的仓库项目：hubdocker
+账户名和密码：admin  4tgb5rfv^YHN
+
+
+基本信息
+集群名称
+Uat-k8s测试集群
+集群 ID
+cf0177973c9954674913c93ecb58b2bd6
+
+地域
+华北2（北京）
+集群类型
+ACK 托管集群
+集群规格
+Pro 版
+集群状态
+运行中
+K8s 版本
+1.24.6-aliyun.1
+已过期
+前往升级
+集群维护窗口
+已开启编辑｜关闭了解集群维护窗口
+集群删除保护
+已开启
+关闭
+版本自动升级
+未开启
+ 
+开启
+时区
+Asia/Shanghai
+
+编辑
+网络
+VPC
+vpc-2ze7ddt6io7oeyzby1suk
+控制面交换机
+vsw-2zeklh96ccdn82vna8xhj
+编辑
+网络堆栈类型
+IPv4
+控制面安全组
+sg-2zedmeg2gi98n6qdxbap
+编辑
+API server 内网端点
+https://192.168.0.216:6443
+
+设置访问控制
+API server 公网端点
+https://8.131.73.229:6443
+更换
+解绑
+API server 负载均衡（SLB）
+lb-2zeswmjn5k6spoc4ooysw
+自定义证书 SAN
+-
+编辑
+网络插件
+Flannel
+Service CIDR
+172.16.0.0/16
+服务转发模式
+IPVS
+安全与审计
+RRSA OIDC
+未开启开启
+Secret 落盘加密
+未开启开启
+审计日志
+未开启 去开启
+控制面组件日志
+未开启去开启
+集群资源
+资源编排 ROS
+k8s-for-cs-cf0177973c9954674913c93ecb58b2bd6
+Worker RAM 角色
+KubernetesWorkerRole-2e686c3e-ee59-4438-8b01-700dab70ac56
+标签分组
+资源组
+rg-acfm4ipslprwhly
+/default resource group
+ 
+修改资源组
+标签
+ack.aliyun.com:cf0177973c9954674913c93ecb58b2bd6acs:rm:rgId:rg-acfm4ipslprwhly
+
+
+节点操作系统：Alibaba Cloud Linux 3.2104 LTS 64位
+集群版本与容器版本信息：
+v1.24.6-aliyun.1 containerd://1.6.38 aliyun_3_x64_20G_alibase_20241218.vhd
+
+
+

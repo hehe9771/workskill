@@ -5,7 +5,10 @@
       "Bash(PLUGIN_ROOT=\"C:/Users/wuyan/.claude/plugins/cache/claude-notifications-go/claude-notifications-go/1.33.0\" CLAUDE_PLUGIN_ROOT=\"$PLUGIN_ROOT\" echo '{\"\"\"\"session_id\"\"\"\":\"\"\"\"test-session\"\"\"\",\"\"\"\"transcript_path\"\"\"\":\"\"\"\"C:/Users/wuyan/.claude/projects/test.jsonl\"\"\"\"}')",
       "Bash(\"$PLUGIN_ROOT/bin/claude-notifications-windows-amd64.exe\" handle-hook:*)",
       "Bash(PLUGIN_ROOT=\"C:/Users/wuyan/.claude/plugins/cache/claude-notifications-go/claude-notifications-go/1.33.0\" export CLAUDE_PLUGIN_ROOT=\"$PLUGIN_ROOT\" echo '{\"\"\"\"session_id\"\"\"\":\"\"\"\"test-session\"\"\"\",\"\"\"\"transcript_path\"\"\"\":\"\"\"\"C:/Users/wuyan/.claude/projects/test.jsonl\"\"\"\"}')",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Read(//c/Users/wuyan/.vibe-kanban/**)",
+      "Read(//c/Users/wuyan/AppData/**)",
+      "Bash(npx -y vibe-kanban@latest)"
     ]
   }
 }

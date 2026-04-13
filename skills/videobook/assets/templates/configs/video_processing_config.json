@@ -1,0 +1,24 @@
+{
+  "processing": {
+    "default_resolution": "highest",
+    "output_format": "mp4",
+    "max_file_size": "2GB"
+  },
+  "audio_extraction": {
+    "format": "WAV",
+    "sample_rate": "16kHz",
+    "bit_depth": "16-bit",
+    "channels": "mono"
+  },
+  "text_conversion": {
+    "encoding": "UTF-8",
+    "line_ending": "unix",
+    "max_segment_length": 500,
+    "min_segment_length": 50
+  },
+  "chart_generation": {
+    "default_chart_type": "flowchart",
+    "supported_types": ["flowchart", "sequence", "class", "state", "er", "gantt", "pie", "git", "c4"],
+    "theme": "default"
+  }
+}

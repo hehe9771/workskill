@@ -1,0 +1,54 @@
+# Profiles Config for Clash Verge
+
+current: LotEIu5tIkYT
+items:
+- uid: Merge
+  type: merge
+  name: null
+  file: Merge.yaml
+  updated: 1774666018
+- uid: Script
+  type: script
+  name: null
+  file: Script.js
+  updated: 1774666018
+- uid: myPlvXXrMaxM
+  type: merge
+  name: null
+  file: myPlvXXrMaxM.yaml
+  updated: 1774669504
+- uid: st12sEZt7uZx
+  type: script
+  name: null
+  file: st12sEZt7uZx.js
+  updated: 1774669504
+- uid: r1C3Hg1M36OV
+  type: rules
+  name: null
+  file: r1C3Hg1M36OV.yaml
+  updated: 1774669504
+- uid: pdVxd7T5QSRn
+  type: proxies
+  name: null
+  file: pdVxd7T5QSRn.yaml
+  updated: 1774669504
+- uid: gqpTLUUCLEPd
+  type: groups
+  name: null
+  file: gqpTLUUCLEPd.yaml
+  updated: 1774669504
+- uid: LotEIu5tIkYT
+  type: local
+  name: cc代理
+  file: LotEIu5tIkYT.yaml
+  desc: ''
+  selected:
+  - name: baiud-group
+    now: brd-static-us
+  updated: 1774669504
+  option:
+    merge: myPlvXXrMaxM
+    script: st12sEZt7uZx
+    rules: r1C3Hg1M36OV
+    proxies: pdVxd7T5QSRn
+    groups: gqpTLUUCLEPd
