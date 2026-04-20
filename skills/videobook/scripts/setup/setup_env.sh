@@ -46,16 +46,29 @@ for cmd in opencli; do
     fi
 done
 
-# 特别处理FFmpeg，因为它可能不在标准路径中
+# 特别处理FFmpeg（优先环境变量，再尝试常见位置）
 if ! command -v ffmpeg &> /dev/null; then
-    # 尝试使用预设的路径
-    CUSTOM_FFMPEG_PATH="/d/mydoc/workskill/ffmpeg-8.0/bin"
-    if [ -f "$CUSTOM_FFMPEG_PATH/ffmpeg.exe" ]; then
-        # 将FFmpeg路径添加到当前会话的PATH
-        export PATH="$PATH:$CUSTOM_FFMPEG_PATH"
-        echo "FFmpeg已添加到PATH: $CUSTOM_FFMPEG_PATH"
+    # 环境变量优先
+    if [ -n "$FFMPEG_BINARY" ] && [ -f "$FFMPEG_BINARY" ]; then
+        FFMPEG_DIR="$(dirname "$FFMPEG_BINARY")"
+        export PATH="$PATH:$FFMPEG_DIR"
+        echo "FFmpeg已添加到PATH (来自FFMPEG_BINARY): $FFMPEG_DIR"
+    elif [ -n "$FFMPEG_PATH" ] && [ -d "$FFMPEG_PATH" ]; then
+        export PATH="$PATH:$FFMPEG_PATH"
+        echo "FFmpeg已添加到PATH (来自FFMPEG_PATH): $FFMPEG_PATH"
     else
-        MISSING_TOOLS+=("ffmpeg")
+        # 常见位置候选
+        for dir in "D:/mydoc/workskill/ffmpeg-8.0/bin" "/d/mydoc/workskill/ffmpeg-8.0/bin" "$HOME/workskill/ffmpeg-8.0/bin" "C:/Program Files/ffmpeg/bin"; do
+            dir="${dir/#\~/$HOME}"
+            if [ -f "$dir/ffmpeg.exe" ] || [ -f "$dir/ffmpeg" ]; then
+                export PATH="$PATH:$dir"
+                echo "FFmpeg已添加到PATH: $dir"
+                break
+            fi
+        done
+        if ! command -v ffmpeg &> /dev/null; then
+            MISSING_TOOLS+=("ffmpeg")
+        fi
     fi
 fi
 

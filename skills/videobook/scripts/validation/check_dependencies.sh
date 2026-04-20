@@ -1,11 +1,73 @@
 #!/bin/bash
 # 检查 videobook 技能的依赖项
+# 所有路径通过环境变量配置，不再硬编码
 set -e
 
-PYTHON_CMD="C:/Users/wuyan/.conda/envs/picproject/python.exe"
-FFMPEG_PATH="D:/mydoc/workskill/ffmpeg-8.0/bin"
+# Python路径：优先环境变量，再尝试常见位置
+find_python() {
+    local candidates=(
+        "${PYTHON_PATH:-}"
+        "${VIDEOBOOK_PYTHON_PATH:-}"
+        "C:/Users/${USERNAME:-wuyan}/.conda/envs/picproject/python.exe"
+        "$HOME/.conda/envs/picproject/python.exe"
+        "python"
+        "python3"
+    )
+    for p in "${candidates[@]}"; do
+        [ -z "$p" ] && continue
+        p="${p/#\~/$HOME}"
+        if [ -f "$p" ] && "$p" --version &>/dev/null 2>&1; then
+            echo "$p"
+            return
+        fi
+    done
+    if command -v python &>/dev/null; then
+        echo "python"
+        return
+    fi
+    echo ""
+}
+
+# FFmpeg路径：优先环境变量，再尝试常见位置
+find_ffmpeg() {
+    if [ -n "$FFMPEG_BINARY" ] && [ -f "$FFMPEG_BINARY" ]; then
+        dirname "$FFMPEG_BINARY"
+        return
+    fi
+    if [ -n "$FFMPEG_PATH" ] && [ -d "$FFMPEG_PATH" ]; then
+        echo "$FFMPEG_PATH"
+        return
+    fi
+    local candidates=(
+        "D:/mydoc/workskill/ffmpeg-8.0/bin"
+        "/d/mydoc/workskill/ffmpeg-8.0/bin"
+        "$HOME/workskill/ffmpeg-8.0/bin"
+        "C:/Program Files/ffmpeg/bin"
+        "/usr/local/bin"
+        "/usr/bin"
+    )
+    for dir in "${candidates[@]}"; do
+        dir="${dir/#\~/$HOME}"
+        if [ -f "$dir/ffmpeg.exe" ] || [ -f "$dir/ffmpeg" ]; then
+            echo "$dir"
+            return
+        fi
+    done
+    if command -v ffmpeg &>/dev/null; then
+        echo "system"
+        return
+    fi
+    echo ""
+}
+
+PYTHON_CMD="$(find_python)"
+FFMPEG_PATH="$(find_ffmpeg)"
 
 echo "正在检查 videobook 依赖项..."
+echo "检测到的路径配置:"
+echo "  Python: ${PYTHON_CMD:-未找到}"
+echo "  FFmpeg: ${FFMPEG_PATH:-未找到}"
+echo ""
 MISSING=()
 
 # 检查 opencli

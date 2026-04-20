@@ -16,18 +16,38 @@ mkdir -p "$OUTPUT_DIR"
 
 echo "正在下载视频: $VIDEO_URL"
 
-# 查找 FFmpeg
+# 查找 FFmpeg（优先环境变量，再尝试常见位置）
 find_ffmpeg() {
+    # 环境变量优先
+    if [ -n "$FFMPEG_BINARY" ] && [ -f "$FFMPEG_BINARY" ]; then
+        echo "$FFMPEG_BINARY"
+        return
+    fi
+    if [ -n "$FFMPEG_PATH" ]; then
+        if [ -f "$FFMPEG_PATH/ffmpeg.exe" ]; then
+            echo "$FFMPEG_PATH/ffmpeg.exe"
+            return
+        elif [ -f "$FFMPEG_PATH/ffmpeg" ]; then
+            echo "$FFMPEG_PATH/ffmpeg"
+            return
+        fi
+    fi
+    # 系统命令
     if command -v ffmpeg &> /dev/null; then
         echo "ffmpeg"
         return
     fi
+    # 常见位置候选（最后备用）
     local candidates=(
         "D:/mydoc/workskill/ffmpeg-8.0/bin/ffmpeg.exe"
         "/d/mydoc/workskill/ffmpeg-8.0/bin/ffmpeg.exe"
+        "$HOME/workskill/ffmpeg-8.0/bin/ffmpeg.exe"
         "C:/Program Files/ffmpeg/bin/ffmpeg.exe"
+        "/usr/local/bin/ffmpeg"
+        "/usr/bin/ffmpeg"
     )
     for f in "${candidates[@]}"; do
+        f="${f/#\~/$HOME}"
         if [ -f "$f" ]; then
             echo "$f"
             return

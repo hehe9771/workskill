@@ -1,7 +1,7 @@
 #!/bin/bash
 # 从视频中提取音频并转换为文本
 # 该脚本使用openai-whisper技能从视频中提取音频并转换为文本
-# 严格按照要求：whisper技能必须调用成功，不能使用备选方案
+# 所有路径通过环境变量配置，不再硬编码
 
 if [ $# -ne 2 ]; then
     echo "用法: $0 <video_file> <output_txt_file>"
@@ -23,55 +23,111 @@ if [ ! -f "$VIDEO_FILE" ]; then
     exit 1
 fi
 
-# 检查Python是否可用
-SPECIFIC_PYTHON="C:/Users/wuyan/.conda/envs/picproject/python.exe"
-if [ -f "$SPECIFIC_PYTHON" ]; then
-    # 检查whisper是否已安装在特定Python环境中
-    if "$SPECIFIC_PYTHON" -c "import whisper" 2>/dev/null; then
-        echo "Whisper已安装，正在处理音频..."
-        PYTHON_CMD="$SPECIFIC_PYTHON"
-    else
-        echo "错误: Whisper未安装在指定环境中。正在尝试安装..."
-        # 尝试安装whisper
-        echo "正在使用pip安装whisper..."
-        "$SPECIFIC_PYTHON" -m pip install --upgrade pip
-        if "$SPECIFIC_PYTHON" -m pip install openai-whisper; then
-            PYTHON_CMD="$SPECIFIC_PYTHON"
-            echo "Whisper安装成功"
-        else
-            echo "错误: Whisper安装失败"
-            exit 1
+# 动态查找 Python 解释器
+find_python() {
+    local candidates=(
+        "${PYTHON_PATH:-}"
+        "${VIDEOBOOK_PYTHON_PATH:-}"
+        "C:/Users/${USERNAME:-wuyan}/.conda/envs/picproject/python.exe"
+        "$HOME/.conda/envs/picproject/python.exe"
+        "python"
+        "python3"
+    )
+    for p in "${candidates[@]}"; do
+        [ -z "$p" ] && continue
+        p="${p/#\~/$HOME}"
+        if [ -f "$p" ] && "$p" --version &>/dev/null 2>&1; then
+            echo "$p"
+            return
         fi
+    done
+    if command -v python &>/dev/null; then
+        echo "python"
+        return
     fi
-else
-    echo "错误: 指定的Python解释器不存在: $SPECIFIC_PYTHON"
+    echo ""
+}
+
+# 动态查找 FFmpeg
+find_ffmpeg() {
+    if [ -n "$FFMPEG_BINARY" ] && [ -f "$FFMPEG_BINARY" ]; then
+        dirname "$FFMPEG_BINARY"
+        return
+    fi
+    if [ -n "$FFMPEG_PATH" ] && [ -d "$FFMPEG_PATH" ]; then
+        echo "$FFMPEG_PATH"
+        return
+    fi
+    local candidates=(
+        "D:/mydoc/workskill/ffmpeg-8.0/bin"
+        "/d/mydoc/workskill/ffmpeg-8.0/bin"
+        "$HOME/workskill/ffmpeg-8.0/bin"
+        "C:/Program Files/ffmpeg/bin"
+        "/usr/local/bin"
+        "/usr/bin"
+    )
+    for dir in "${candidates[@]}"; do
+        dir="${dir/#\~/$HOME}"
+        if [ -f "$dir/ffmpeg.exe" ] || [ -f "$dir/ffmpeg" ]; then
+            echo "$dir"
+            return
+        fi
+    done
+    if command -v ffmpeg &>/dev/null; then
+        echo "system"
+        return
+    fi
+    echo ""
+}
+
+PYTHON_CMD="$(find_python)"
+FFMPEG_DIR="$(find_ffmpeg)"
+
+if [ -z "$PYTHON_CMD" ]; then
+    echo "错误: 未找到可用的 Python 解释器"
     exit 1
 fi
 
-# 确保FFmpeg在系统中可用
-CUSTOM_FFMPEG_PATH="/d/mydoc/workskill/ffmpeg-8.0/bin"
+echo "使用 Python: $PYTHON_CMD"
+echo "使用 FFmpeg 目录: ${FFMPEG_DIR:-系统PATH}"
 
-# 检查FFmpeg是否在路径中可用
-if ! command -v ffmpeg &> /dev/null; then
-    # 如果不在路径中，尝试添加到路径
-    export PATH="$PATH:$CUSTOM_FFMPEG_PATH"
+# 检查whisper是否已安装
+if ! "$PYTHON_CMD" -c "import whisper" 2>/dev/null; then
+    echo "Whisper未安装，正在尝试安装..."
+    "$PYTHON_CMD" -m pip install --upgrade pip
+    if ! "$PYTHON_CMD" -m pip install openai-whisper; then
+        echo "错误: Whisper安装失败"
+        exit 1
+    fi
+    echo "Whisper安装成功"
 fi
 
-# 设置环境变量给Python使用
-export PATH="$PATH:$CUSTOM_FFMPEG_PATH"
-export FFMPEG_BINARY="$CUSTOM_FFMPEG_PATH/ffmpeg.exe"
+# 设置 FFmpeg 环境变量
+if [ -n "$FFMPEG_DIR" ] && [ "$FFMPEG_DIR" != "system" ]; then
+    export PATH="$PATH:$FFMPEG_DIR"
+    export FFMPEG_BINARY="$FFMPEG_DIR/ffmpeg.exe"
+    FFMPEG_EXE="$FFMPEG_DIR/ffmpeg.exe"
+else
+    FFMPEG_EXE="ffmpeg"
+fi
 
-echo "使用FFmpeg路径: $FFMPEG_BINARY"
+echo "使用FFmpeg: $FFMPEG_EXE"
 
-# 使用经过验证的手动测试方法执行whisper
-if $PYTHON_CMD -c "
+# 获取 Whisper 模型（可通过环境变量配置）
+WHISPER_MODEL="${VIDEOBOOK_WHISPER_MODEL:-tiny}"
+
+# 使用 Python 执行 whisper
+if "$PYTHON_CMD" -c "
 import os
-# 设置FFmpeg路径
-os.environ['FFMPEG_BINARY'] = '$CUSTOM_FFMPEG_PATH/ffmpeg.exe'
-
 import whisper
+
+# 设置FFmpeg路径（如果指定了自定义路径）
+ffmpeg_path = '$FFMPEG_EXE'
+if ffmpeg_path and ffmpeg_path != 'ffmpeg':
+    os.environ['FFMPEG_BINARY'] = ffmpeg_path
+
 print('正在加载模型...')
-model = whisper.load_model('tiny')
+model = whisper.load_model('$WHISPER_MODEL')
 print('开始转录...')
 result = model.transcribe('$VIDEO_FILE')
 print('转录完成，写入文件...')
@@ -83,16 +139,13 @@ print('音频转文本成功完成')
         echo "音频转文本成功: $OUTPUT_TXT_FILE"
     else
         echo "错误: Python脚本执行完成但输出文件未创建"
-        echo "检查 $(dirname "$OUTPUT_TXT_FILE") 目录内容:"
         ls -la "$(dirname "$OUTPUT_TXT_FILE")/"
         exit 1
     fi
 else
     echo "错误: Whisper转录失败"
-    # 作为备选方案，使用命令行方式
     echo "尝试使用命令行方式执行whisper..."
-    if $PYTHON_CMD -m whisper "$VIDEO_FILE" --output_dir "$(dirname "$OUTPUT_TXT_FILE")" --output_format txt --model tiny; then
-        # 查找生成的txt文件并移动到期望位置
+    if "$PYTHON_CMD" -m whisper "$VIDEO_FILE" --output_dir "$(dirname "$OUTPUT_TXT_FILE")" --output_format txt --model "$WHISPER_MODEL"; then
         POSSIBLE_TXT_FILE="$(dirname "$OUTPUT_TXT_FILE")/$(basename "$VIDEO_FILE" .mp4).txt"
         if [ -f "$POSSIBLE_TXT_FILE" ]; then
             mv "$POSSIBLE_TXT_FILE" "$OUTPUT_TXT_FILE"

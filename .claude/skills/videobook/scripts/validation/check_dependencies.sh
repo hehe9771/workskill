@@ -1,9 +1,35 @@
 #!/bin/bash
 # 检查 videobook 技能的依赖项
+# 脚本自动检测技能目录位置，兼容项目级和全局级安装
 set -e
 
-PYTHON_CMD="C:/Users/wuyan/.conda/envs/picproject/python.exe"
-FFMPEG_PATH="D:/mydoc/workskill/ffmpeg-8.0/bin"
+# 自动检测技能目录（脚本位于 scripts/validation/ 下，往上两级是技能根目录）
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+SKILL_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+# Python 路径：优先环境变量，其次自动检测
+if [ -n "$VIDEOBOOK_PYTHON" ]; then
+    PYTHON_CMD="$VIDEOBOOK_PYTHON"
+elif [ -n "$CONDA_PREFIX" ]; then
+    PYTHON_CMD="$CONDA_PREFIX/python.exe"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+elif command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+else
+    PYTHON_CMD=""  # 将在检查时报错
+fi
+
+# FFmpeg 路径：优先环境变量，其次自动检测
+if [ -n "$VIDEOBOOK_FFMPEG" ]; then
+    FFMPEG_PATH="$VIDEOBOOK_FFMPEG"
+elif [ -n "$FFMPEG_BINARY" ]; then
+    FFMPEG_PATH="$FFMPEG_BINARY"
+elif command -v ffmpeg &> /dev/null; then
+    FFMPEG_PATH=""  # 使用系统PATH
+else
+    FFMPEG_PATH=""  # 将在检查时报错
+fi
 
 echo "正在检查 videobook 依赖项..."
 MISSING=()
@@ -38,8 +64,9 @@ else
 fi
 
 # 检查 FFmpeg
-FFMPEG_EXE="$FFMPEG_PATH/ffmpeg.exe"
-if [ -f "$FFMPEG_EXE" ]; then
+if [ -n "$FFMPEG_PATH" ] && [ -f "$FFMPEG_PATH/ffmpeg.exe" ]; then
+    echo "[OK] FFmpeg: 已安装 ($FFMPEG_PATH)"
+elif [ -n "$FFMPEG_PATH" ] && [ -f "$FFMPEG_PATH/ffmpeg" ]; then
     echo "[OK] FFmpeg: 已安装 ($FFMPEG_PATH)"
 elif command -v ffmpeg &> /dev/null; then
     echo "[OK] FFmpeg: 已安装 (系统PATH)"
