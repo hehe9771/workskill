@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "Pandas Data Analysis": {
+      "source": "pluginagentmarketplace/custom-plugin-python",
+      "sourceType": "github",
+      "computedHash": "33ee9dcf6d5ea38d65bb59c4c6c1337d90688a71829d76cd781de403e68dd533"
+    },
+    "csv-processor": {
+      "source": "curiouslearner/devkit",
+      "sourceType": "github",
+      "computedHash": "2ad34636ce4b99f973fd52e1bb727a78d01c76d6b6a8ee8fbc01fe4644f3d5b9"
+    },
+    "data-analysis": {
+      "source": "scientiacapital/skills",
+      "sourceType": "github",
+      "computedHash": "36112cec73a3f0e62f985a85fdaaccc46af6cb60cea4380c153f41328115b17c"
+    }
+  }
+}
