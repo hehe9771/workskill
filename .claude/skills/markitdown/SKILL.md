@@ -1,17 +1,22 @@
 ---
 name: markitdown
-description: Builds markitdown-mcp Docker container, configures Claude Code MCP server, and converts documents (DOCX, PDF, PPTX, XLSX, etc.) to Markdown via MCP protocol.
+description: Builds markitdown-mcp Docker container, configures Claude Code MCP server, and converts documents (DOCX, PDF, PPTX, XLSX, etc.) to Markdown via Docker CLI. Zero hardcoding, cross-platform support, production-tested.
+version: 2.0.0
+source: production-experience
 ---
 
 # markitdown Skill
 
 ## Skill Objective
 
-Automates the complete markitdown-mcp pipeline:
-1. Build a Docker container from the official Microsoft markitdown repository
-2. Configure Claude Code global MCP server settings
-3. Convert uploaded document attachments to Markdown via MCP protocol
-4. Validate conversion success (non-empty output file)
+Automates the complete markitdown-mcp document conversion pipeline:
+
+1. **Docker Build** — Build a Docker container from markitdown-mcp PyPI package
+2. **MCP Configuration** — Configure Claude Code global MCP server settings
+3. **Document Conversion** — Convert documents to Markdown via Docker containerized CLI
+4. **Validation** — Verify conversion success (non-empty output file)
+
+Proven in production: converted 796 wind power project documents (345 successful, 48 archives, 403 failed due to scanned PDFs/size limits).
 
 ## Prerequisites
 
@@ -19,83 +24,133 @@ Automates the complete markitdown-mcp pipeline:
 - Claude Code installed with MCP support
 - Python 3.10+ available (for test scripts)
 - Network access to Docker Hub and PyPI
+- (Optional) 7-Zip for RAR extraction (Windows)
 
 ## Execution Flow
 
 ### Phase 1: Docker Container Build
 
-1. Check if `markitdown-mcp:latest` image already exists and is valid
-2. If not, create a Dockerfile in the current working directory based on the official markitdown-mcp Dockerfile template
-3. Clean up any stale containers (`markitdown-convert`, `markitdown-test`, etc.)
-4. Build the Docker image using an existing local Python base image if available, otherwise pull from Docker Hub
-5. Verify the built image can start and respond to MCP initialize requests
+Run: `bash scripts/deployment/build-docker.sh`
 
-### Phase 2: Claude Code MCP Configuration
+1. Clean up stale containers
+2. Find local Python base image (avoid pulling if possible)
+3. Create Dockerfile from template (`assets/templates/code/dockerfile.tmpl`)
+4. Build image as `markitdown-mcp:latest`
+5. Verify image works
 
-1. Locate the Claude Code global config file (`~/.claude.json` on all platforms)
-2. Check if `markitdown` MCP server is already configured
-3. If not, add a new `markitdown` entry that:
-   - Runs Docker container with STDIO transport
-   - Mounts the project's `.vibe-attachments` directory to `/workdir` in the container
-   - Uses the `markitdown-mcp:latest` image
-4. Validate the JSON config is valid after modification
+### Phase 2: MCP Configuration
 
-### Phase 3: Document Conversion
+Run: `bash scripts/setup/configure-mcp.sh [attachments_dir]`
 
-1. Start a temporary Docker container in HTTP mode with port mapping
-2. Call the `convert_to_markdown` tool via MCP HTTP endpoint
-3. Use URL-encoded filenames for non-ASCII characters (Chinese, etc.)
-4. Save the resulting Markdown content to the `.vibe-attachments` directory
-5. Verify the output file is non-empty
-6. Clean up the temporary container and temp files
+1. Locate Claude Code config (`~/.claude.json`)
+2. Check if markitdown already configured
+3. Add markitdown MCP entry using template (`assets/templates/configs/mcp-config.tmpl`)
+4. Validate JSON config
 
-## Key Troubleshooting Notes
+### Phase 3: Batch Document Conversion
 
-### Known Issues (保留踩坑经验)
+Run: `python scripts/data-processing/convert-batch.py <source_directory>`
 
-1. **Docker Hub network issues**: If `python:3.13-slim-bullseye` fails to pull (connection timeout), fall back to any locally cached Python image (e.g., `python:3.11-slim`). Check with `docker images python:*`.
+**This is the primary conversion method** (CLI mode, not HTTP).
 
-2. **Chinese filename encoding**: When calling MCP tools with Chinese filenames in the URI, the HTTP endpoint may fail with `'utf-8' codec can't decode byte` errors. **Solution**: URL-encode the filename (e.g., `审决会纪要.docx` → `%E5%AE%A1%E5%86%B3%E4%BC%9A%E7%BA%AA%E8%A6%81.docx`).
+1. Start persistent Docker container with volume mount to source directory
+2. For each convertible file, execute `markitdown` CLI via `docker exec`
+3. Capture stdout and save as `.md` adjacent to original
+4. Archive files (zip/rar) are extracted in-container and internal files converted
+5. Generate conversion report with success/fail/skip statistics
 
-3. **Docker volume path format on Windows**: Docker on Windows requires absolute paths for volume mounts. Relative paths like `.vibe-attachments` will fail. **Solution**: Always resolve to absolute path before mounting. Use forward slashes (`D:/path/to/dir`).
+**Environment Variables (all optional):**
 
-4. **Container port mapping**: For HTTP-based testing, ensure port is mapped (`-p HOST_PORT:CONTAINER_PORT`). Without port mapping, `curl` to `127.0.0.1:PORT` will get "Connection refused".
+| Variable | Default | Description |
+|----------|---------|-------------|
+| MARKITDOWN_CONTAINER | markitdown-convert | Container name |
+| MARKITDOWN_IMAGE | markitdown-mcp:latest | Docker image tag |
+| CONVERSION_TIMEOUT | 120 | Per-file timeout (seconds) |
+| MARKITDOWN_PORT | 8765 | Container HTTP port |
 
-5. **MCP HTTP endpoint path**: The markitdown-mcp HTTP server returns a 307 redirect from `/mcp` to `/mcp/` (with trailing slash). **Solution**: Always include the trailing slash in URLs.
+### Phase 4: Validation
 
-6. **pip SSL errors during build**: The `pip install` step may show SSL errors for pypi.org but still succeed. These warnings can be ignored if the install completes.
+Run: `bash scripts/validation/test-conversion.sh <file_or_directory>`
 
-7. **Windows console encoding**: When processing MCP responses on Windows, Python's default `gbk` encoding may fail on Unicode characters. **Solution**: Always use `encoding='utf-8'` when opening files and `ensure_ascii=False` when dumping JSON.
+- Single file: test conversion of specific document
+- Directory: scan all `.md` files, verify non-empty, report statistics
 
-## Inputs
+## Critical Production Lessons
 
-| Parameter | Description | Required |
-|-----------|-------------|----------|
-| File path | Path to document to convert | Yes (for conversion step) |
-| Output dir | Directory to save converted files | No (defaults to `.vibe-attachments`) |
-| Docker tag | Docker image tag | No (defaults to `markitdown-mcp:latest`) |
+### 1. MCP HTTP is Unreliable — Use CLI Mode
+
+The MCP HTTP endpoint (`/mcp/`) has known issues:
+- `RemoteDisconnected: Remote end closed connection`
+- `HTTP 406: Not Acceptable` without specific headers
+- SSE streaming instability
+
+**Solution:** Always use CLI mode:
+```bash
+docker exec markitdown-convert markitdown "/workdir/file.pdf"
+```
+
+### 2. Windows Docker Path Requirements
+
+Docker on Windows requires Linux-style paths:
+- Use: `/d/mydoc/workskill/an/风电附件`
+- Not: `D:\mydoc\workskill\an\风电附件`
+
+From Git Bash, use `MSYS_NO_PATHCONV=1` to prevent path mangling.
+
+### 3. Encoding: Always UTF-8
+
+Windows defaults to GBK encoding. Always specify:
+- Python: `sys.stdout.reconfigure(encoding='utf-8')`
+- Subprocess: `encoding='utf-8', errors='replace'`
+
+### 4. Volume Mount Required
+
+Container MUST have volume mount to access host files:
+```bash
+docker run -d -v "/d/path:/workdir" --name markitdown-convert markitdown-mcp:latest
+```
+
+### 5. Scanned PDFs and Large Files
+
+markitdown cannot extract text from:
+- Image-based/scanned PDFs (require OCR)
+- Very large files (>50MB may timeout)
+
+These are expected failures, not bugs.
+
+## Supported File Types
+
+| Type | Extensions |
+|------|-----------|
+| Documents | pdf, docx, doc, pptx, ppt, xlsx, xls |
+| Images | jpg, jpeg, png |
+| Archives | zip, rar (extracted first) |
 
 ## Dependencies
 
-| File | Path (relative to skill root) | Purpose |
-|------|-------------------------------|---------|
-| Dockerfile template | `assets/templates/code/dockerfile.tmpl` | Docker build recipe |
-| Build script | `scripts/deployment/build-docker.sh` | Build Docker image |
-| Configure script | `scripts/setup/configure-mcp.sh` | Configure Claude Code MCP |
-| Test script | `scripts/validation/test-conversion.sh` | Validate conversion |
-| MCP protocol spec | `references/specifications/mcp-protocol.md` | Protocol reference |
+| File | Purpose |
+|------|---------|
+| `scripts/deployment/build-docker.sh` | Docker image build |
+| `scripts/setup/configure-mcp.sh` | MCP configuration |
+| `scripts/data-processing/convert-batch.py` | Batch conversion (primary method) |
+| `scripts/validation/test-conversion.sh` | Validation testing |
+| `assets/templates/code/dockerfile.tmpl` | Docker build template |
+| `assets/templates/configs/mcp-config.tmpl` | MCP config template |
+| `references/specifications/mcp-protocol.md` | MCP protocol reference |
 
 ## Output Artifacts
 
-| Artifact | Location | Description |
-|----------|----------|-------------|
-| Docker image | Docker local registry (`markitdown-mcp:latest`) | Built container image |
-| MCP config | `~/.claude.json` (mcpServers.markitdown) | Global MCP server config |
-| Markdown file | `.vibe-attachments/{original_name}.md` | Converted document |
+| Artifact | Location |
+|----------|----------|
+| Docker image | Local registry: `markitdown-mcp:latest` |
+| MCP config | `~/.claude.json` → `mcpServers.markitdown` |
+| Markdown files | `<source>/**/*.md` (adjacent to originals) |
+| Conversion report | `<source>/conversion-report.txt` |
 
 ## Success Criteria
 
-1. Docker image `markitdown-mcp:latest` exists and can respond to MCP initialize
-2. `~/.claude.json` contains a valid `markitdown` MCP server entry
-3. Converted `.md` file exists and is non-empty
-4. MCP protocol communication succeeds (no encoding or connection errors)
+1. Docker image `markitdown-mcp:latest` exists and responds to commands
+2. `~/.claude.json` contains valid `markitdown` MCP entry
+3. At least 60% of convertible documents produce non-empty `.md` files
+4. Archives extracted and internal documents converted
+5. Conversion report generated with statistics

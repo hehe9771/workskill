@@ -1,0 +1,3 @@
+# 敏感文件
+**/.env
+**/backup-config.json
