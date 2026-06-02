@@ -1,3 +1,9 @@
 # 敏感文件
 **/.env
 **/backup-config.json
+
+# 依赖
+node_modules/
+
+# 输出
+output/
