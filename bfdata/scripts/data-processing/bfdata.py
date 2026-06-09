@@ -15,9 +15,41 @@ import tarfile
 import traceback
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Optional, List, Tuple, Literal
+from typing import Optional, List, Tuple, Literal, Set
 
 from dotenv import load_dotenv
+
+# ---------------------------------------------------------------------------
+# 默认排除目录（不会被备份）
+# 可通过环境变量 BFDATA_EXCLUDE 覆盖（逗号分隔的目录名列表）
+# ---------------------------------------------------------------------------
+DEFAULT_EXCLUDE_DIRS = [
+    "node_modules",
+    ".tmp",
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".tox",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".idea",
+    ".vscode",
+    "dist",
+    "build",
+    ".next",
+    ".nuxt",
+    ".cache",
+]
+
+
+def get_exclude_patterns() -> Set[str]:
+    """获取排除目录名集合，合并默认值和环境变量 BFDATA_EXCLUDE。"""
+    patterns = set(DEFAULT_EXCLUDE_DIRS)
+    env_exclude = os.environ.get("BFDATA_EXCLUDE", "")
+    if env_exclude:
+        patterns.update(p.strip() for p in env_exclude.split(",") if p.strip())
+    return patterns
 
 # ---------------------------------------------------------------------------
 # 路径推断：从脚本自身位置推导技能根目录，支持跨平台
@@ -130,13 +162,24 @@ def create_archive(compressor: Literal["7z", "tar"], sources: List[str], output_
 
 def _create_tar(sources: List[str], archive_path: str) -> Optional[str]:
     """使用 Python 内置 tarfile 模块创建归档（跨平台，无需 shell）。"""
+    exclude_dirs = get_exclude_patterns()
+    if exclude_dirs:
+        print(f"[INFO] 排除目录: {', '.join(sorted(exclude_dirs))}")
+
+    def _filter(tarinfo: tarfile.TarInfo):
+        """过滤掉排除目录中的文件/目录。"""
+        parts = set(tarinfo.name.replace("\\", "/").split("/"))
+        if parts & exclude_dirs:
+            return None
+        return tarinfo
+
     try:
         with tarfile.open(archive_path, "w:gz") as tar:
             for src in sources:
                 src_path = Path(src)
                 arcname = src_path.name
                 print(f"[INFO] 添加: {src}")
-                tar.add(src, arcname=arcname, recursive=True)
+                tar.add(src, arcname=arcname, recursive=True, filter=_filter)
         print(f"[OK] 归档已创建: {archive_path}")
         return archive_path
     except (OSError, tarfile.TarError) as e:
@@ -150,7 +193,15 @@ def _create_7z(sources: List[str], archive_path: str) -> Optional[str]:
     if not exe:
         print("[ERROR] 7z 可执行文件未找到", file=sys.stderr)
         return None
-    cmd = [exe, "a", "-t7z", "-mx=5", archive_path] + sources
+
+    exclude_dirs = get_exclude_patterns()
+    cmd = [exe, "a", "-t7z", "-mx=5"]
+    if exclude_dirs:
+        print(f"[INFO] 排除目录: {', '.join(sorted(exclude_dirs))}")
+        for d in sorted(exclude_dirs):
+            cmd.extend(["-xr!", d])
+    cmd.append(archive_path)
+    cmd.extend(sources)
     try:
         result = subprocess.run(
             cmd,
@@ -246,9 +297,15 @@ def main():
 
     # 构建源路径列表
     sources = []
-    # 1. 从配置文件读取
+    # 1. 从配置文件读取（支持对象格式 {path:...} 和纯字符串格式）
     cfg_sources = config.get("sources", [])
-    sources.extend(cfg_sources)
+    for src in cfg_sources:
+        if isinstance(src, dict):
+            path = src.get("path", "")
+            if path:
+                sources.append(path)
+        elif isinstance(src, str):
+            sources.append(src)
     # 2. 从环境变量 BFDATA_SOURCES 读取（JSON 数组，逗号分隔字符串）
     env_sources = os.environ.get("BFDATA_SOURCES", "")
     if env_sources:
@@ -261,8 +318,18 @@ def main():
         print("[ERROR] 没有配置任何备份源", file=sys.stderr)
         sys.exit(1)
 
-    # 验证路径
-    valid_sources = validate_paths(sources)
+    # 验证路径 + 去重（保留首次出现顺序）
+    raw_valid = validate_paths(sources)
+    seen = set()
+    valid_sources = []
+    for p in raw_valid:
+        if p not in seen:
+            seen.add(p)
+            valid_sources.append(p)
+    dup_count = len(raw_valid) - len(valid_sources)
+    if dup_count > 0:
+        print(f"[INFO] 去重: 移除 {dup_count} 个重复源路径", file=sys.stderr)
+
     if not valid_sources:
         print("[ERROR] 所有备份源路径均无效", file=sys.stderr)
         sys.exit(1)

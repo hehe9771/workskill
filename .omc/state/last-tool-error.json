@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"taskkill /F /PID 27148\",\"description\":\"Kill process on port 19876\"}",
-  "error": "Exit code 1\n����: ��Ч����/ѡ�� - 'F:/'��\r\n���� \"TASKKILL /?\" ���˽��÷���",
-  "timestamp": "2026-05-28T05:41:25.657Z",
+  "tool_input_preview": "{\"command\":\"gh search repos \\\"pencli template in:name,description,readme\\\" --sort stars --limit 15 --json fullName,description,stargazersCount,updatedAt,language,url,isArchived,visibility\",\"descriptio...",
+  "error": "Exit code 127\n/usr/bin/bash: gh: command not found",
+  "timestamp": "2026-06-08T03:39:46.855Z",
   "retry_count": 1
 }

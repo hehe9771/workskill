@@ -41,7 +41,7 @@ bash scripts/setup/init-env.sh
 
 ```bash
 # 指定备份源路径（JSON 数组）
-BFDATA_SOURCES=["D:/mydoc/vibekanban/.vibe-kanban-workspaces","D:/mydoc/k8s-uat","D:/mydoc/proxy","D:/mydoc/qianzhiji"]
+BFDATA_SOURCES=["D:/mydoc/k8s-uat","D:/mydoc/proxy","D:/mydoc/qianzhiji","D:/mydoc/xinjapo","D:/mydoc/PM","D:/mydoc/open-design"]
 
 # 输出目录
 BFDATA_OUTPUT_DIR=D:/mydoc/backup
@@ -90,6 +90,7 @@ bash scripts/validation/validate-backup.sh [归档路径]
 | `BFDATA_OSS_KEY_PREFIX` | `bfdata` | OSS 存储路径前缀 |
 | `BFDATA_OSS_HELPER` | `<project_root>/config/oss-helper.js` | OSS helper 脚本路径 |
 | `BFDATA_CLEANUP` | `keep_on_upload_fail` | 清理策略 |
+| `BFDATA_EXCLUDE` | `node_modules,.tmp,.git,...` | 排除目录名（逗号分隔） |
 | `BFDATA_PYTHON` | `python` | Python 可执行文件路径 |
 | `OSS_ENDPOINT` | — | OSS 端点（可选） |
 | `OSS_ACCESS_KEY_ID` | — | OSS AccessKey（可选） |
