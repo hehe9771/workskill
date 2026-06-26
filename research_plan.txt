@@ -1,0 +1,19 @@
+国内绩效管理系统调研计划
+
+需要调研的产品：
+1. 北森iTalentX - https://www.beisen.com/italentx/
+2. 飞书People/飞书绩效 - https://www.feishu.cn/product/people
+3. 钉钉智能绩效 - https://www.dingtalk.com/
+4. Moka People - https://www.mokahr.com/
+5. 薪人薪事 - https://www.xinrenxinshi.com/
+6. 肯耐珂萨(Kenexa) - https://www.knxsa.com/
+7. i人事 - https://www.irensi.com/
+
+调研维度：
+- 核心功能模块
+- 绩效管理流程（自评、他评、360评估等）
+- 数据采集能力（考勤、业务系统数据对接等）
+- AI/智能分析功能
+- 是否支持自定义评估维度和规则
+- 定价模式
+- 优缺点

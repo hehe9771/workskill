@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"gh search repos \\\"pencli template in:name,description,readme\\\" --sort stars --limit 15 --json fullName,description,stargazersCount,updatedAt,language,url,isArchived,visibility\",\"descriptio...",
-  "error": "Exit code 127\n/usr/bin/bash: gh: command not found",
-  "timestamp": "2026-06-08T03:39:46.855Z",
+  "tool_input_preview": "{\"command\":\"python -c \\\"\\nimport json\\nwith open('C:/Users/wuyan/.claude/settings.json', encoding='utf-8') as f:\\n    data = json.load(f)\\nhooks = data.get('hooks', {})\\nfor event, entries in hooks.it...",
+  "error": "Exit code 49\nPython was not found; run without arguments to install from the Microsoft Store, or disable this shortcut from Settings > Apps > Advanced app settings > App execution aliases.",
+  "timestamp": "2026-06-25T02:46:20.235Z",
   "retry_count": 1
 }

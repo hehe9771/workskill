@@ -6,9 +6,7 @@
       "Bash(\"$PLUGIN_ROOT/bin/claude-notifications-windows-amd64.exe\" handle-hook:*)",
       "Bash(PLUGIN_ROOT=\"C:/Users/wuyan/.claude/plugins/cache/claude-notifications-go/claude-notifications-go/1.33.0\" export CLAUDE_PLUGIN_ROOT=\"$PLUGIN_ROOT\" echo '{\"\"\"\"session_id\"\"\"\":\"\"\"\"test-session\"\"\"\",\"\"\"\"transcript_path\"\"\"\":\"\"\"\"C:/Users/wuyan/.claude/projects/test.jsonl\"\"\"\"}')",
       "Bash(curl:*)",
-      "Read(//c/Users/wuyan/.vibe-kanban/**)",
       "Read(//c/Users/wuyan/AppData/**)",
-      "Bash(npx -y vibe-kanban@latest)",
       "Bash(bash:*)",
       "Bash(C:/Users/wuyan/.conda/envs/picproject/python.exe --version)",
       "Bash(C:/Users/wuyan/.conda/envs/picproject/python.exe -c \"import whisper; print\\('whisper version:', whisper.__version__\\)\")",
@@ -28,7 +26,9 @@
       "Bash(grep \",YES$\" an/风电2025附件_final.csv)",
       "Bash(C:/Users/wuyan/.conda/envs/picproject/python.exe an/fix-categories.py)",
       "Bash(mkdir -p \"D:/mydoc/workskill/.claude/skills/bfdata\")",
-      "Bash(cp -r \"D:/mydoc/workskill/bfdata/.\" \"D:/mydoc/workskill/.claude/skills/bfdata/\")"
+      "Bash(cp -r \"D:/mydoc/workskill/bfdata/.\" \"D:/mydoc/workskill/.claude/skills/bfdata/\")",
+      "Bash(npm view *)",
+      "WebFetch(domain:docs.anthropic.com)"
     ]
   }
 }

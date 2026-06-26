@@ -7,3 +7,10 @@ node_modules/
 
 # 输出
 output/
+.gstack/
+
+# 大文件/临时目录
+neo4j-n10s/
+s2c-output/
+s2c-output.zip
+CCbf/
