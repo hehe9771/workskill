@@ -19,9 +19,7 @@ allowed-tools: Bash(claude:*) Bash(npm:*) Bash(npx:*) Bash(uv:*) Bash(playwright
 | 组件 | 原因 |
 |------|------|
 | `@anthropic-ai/claude-code` | 自动更新可能导致兼容性问题，需手动控制版本 |
-| `claude-mem@thedotmack` | 更新后修复脚本需重跑，手动控制更新时机 |
 | `claude-notifications-go@claude-notifications-go` | 1.40.0 上游发布缺 Windows exe(残缺版),需手动控制版本 |
-| `claude-mem@thedotmack` | 本地有未上游的 mcp-server.cjs dirname 补丁,自动更新会丢失补丁 |
 
 > 如需更新黑名单中的组件，请手动执行对应命令。
 
@@ -231,8 +229,8 @@ for plugin in $PLUGINS_TO_UPDATE; do
     STEP6_FAIL=1
   fi
 done
-# [黑名单] claude plugins update claude-mem@thedotmack
 # [黑名单] claude plugins update claude-notifications-go@claude-notifications-go
+# claude-mem 不在本技能管理范围内，完全跳过，不做任何检查或操作
 
 # 整体验证
 if claude plugins list 2>&1 | grep -q "ecc"; then
@@ -326,10 +324,7 @@ done
 DIR=$(ls -td $NG/*/ 2>/dev/null | head -1)
 test -f "${DIR}bin/claude-notifications-windows-amd64.exe" && record_result "H3" "PASS" "claude-notifications-go exe 存在" || record_result "H3" "FAIL" "claude-notifications-go 无可用 exe"
 
-# ===== H4: claude-mem 版本监控 =====
-CM=~/.claude/plugins/cache/thedotmack
-NON_ORPH=$(ls -d $CM/*/*/ 2>/dev/null | while read d; do [ -f "$d/.orphaned_at" ] || echo "$d"; done | wc -l)
-[ "$NON_ORPH" -le 1 ] && record_result "H4" "PASS" "claude-mem 单版本（补丁在位）" || record_result "H4" "FAIL" "claude-mem 多版本（补丁可能丢失）"
+# ===== H4: (claude-mem 已移出管理范围，不再检查) =====
 
 # ===== H5: temp_git 清理 =====
 rm -rf ~/.claude/plugins/cache/temp_git_* 2>/dev/null
