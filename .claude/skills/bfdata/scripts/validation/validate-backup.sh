@@ -9,6 +9,14 @@ ARCHIVE_PATH="${1:-}"
 if [ -z "$ARCHIVE_PATH" ]; then
     SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     SKILL_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+    # 环境变量未设置时，从 .env 读取 BFDATA_OUTPUT_DIR（与 bfdata.py 的配置源保持一致）
+    if [ -z "${BFDATA_OUTPUT_DIR:-}" ]; then
+        ENV_FILE="${BFDATA_ENV_PATH:-$SKILL_ROOT/assets/static/.env}"
+        if [ -f "$ENV_FILE" ]; then
+            BFDATA_OUTPUT_DIR="$(grep -E '^BFDATA_OUTPUT_DIR=' "$ENV_FILE" | tail -1 | cut -d= -f2- | tr -d '\r')"
+        fi
+    fi
     BACKUP_DIR="${BFDATA_OUTPUT_DIR:-$SKILL_ROOT/../backup}"
 
     LATEST=$(find "$BACKUP_DIR" -name "bfdata-backup-*" -type f 2>/dev/null | sort -r | head -1)

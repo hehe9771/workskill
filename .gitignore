@@ -9,6 +9,9 @@ node_modules/
 output/
 .gstack/
 
+# 崩溃转储
+bash.exe.stackdump
+
 # 大文件/临时目录
 neo4j-n10s/
 s2c-output/
