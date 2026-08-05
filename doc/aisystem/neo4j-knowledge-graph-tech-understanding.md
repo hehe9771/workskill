@@ -578,3 +578,563 @@ ChatOrchestrator（意图识别）
 | Text-to-Cypher | LangChain `GraphCypherQAChain` | ~50-80 行 |
 | GraphRAG | neo4j-graphrag 库 | ~100-150 行 |
 | 推理引擎 | 自建服务层（GDS + SHACL + Cypher 规则 + LLM） | ~300-400 行 |
+
+---
+
+## 九、SPARQL 是什么，Neo4j 需不需要它
+
+### 9.1 SPARQL 是什么
+
+SPARQL 是 **RDF 数据（三元组数据）的专用查询语言**，地位相当于关系型数据库里的 SQL。
+
+RDF 数据是"主语-谓语-宾语"三元组格式：
+
+```
+<张三> -- <是员工> --> <公司A>
+<张三> -- <工号> --> "E001"
+<公司A> -- <位于> --> <北京>
+```
+
+查询语言的对应关系：
+
+| 数据模型 | 查询语言 |
+|---------|---------|
+| 关系表 (SQL) | SQL |
+| 属性图 (Neo4j) | Cypher |
+| RDF 三元组 | **SPARQL** |
+
+SPARQL 查询示例（查"张三属于哪个公司"）：
+
+```sparql
+PREFIX : <http://example.com/>
+SELECT ?company
+WHERE {
+  :张三 :是员工 ?company .
+}
+```
+
+### 9.2 SPARQL 的实际用途
+
+1. **查本体/Ontology** — OWL、RDFS、SKOS 都是 RDF 格式，SPARQL 是查它们的标准语言
+2. **知识图谱互通** — 不同系统间交换语义数据时，SPARQL 是 W3C 标准，跨平台通用
+3. **Linked Data 查询** — DBpedia、Wikidata 等开放知识库都暴露 SPARQL 端点
+
+### 9.3 Neo4j 需不需要 SPARQL
+
+**结论：取决于数据源。**
+
+| 问法 | 答案 |
+|------|------|
+| Neo4j 能跑 SPARQL 吗？ | 不能，它跑 Cypher |
+| Neo4j 需要 SPARQL 吗？ | 不需要，Cypher 能完成等价查询 |
+| 那 n10s 的意义是什么？ | **数据迁移桥梁**：把 RDF 世界的数据搬到属性图世界，搬完之后就用 Cypher 了 |
+
+**两种情况：**
+
+**情况 1：纯属性图场景 → 不需要 SPARQL**
+
+数据本来就是节点+关系（用户、订单、商品等），Neo4j 用 Cypher 就够了，和 SPARQL 完全没关系。99% 的 Neo4j 用户属于这种情况。
+
+**情况 2：数据源是 RDF/本体 → 需要 SPARQL 的等价能力**
+
+如果数据来自语义网、OWL 本体、SKOS 词表等 RDF 格式，这些天然是三元组结构。这时：
+
+- **不用 Neo4j**：直接用 RDF 存储（如 Apache Jena、GraphDB）+ SPARQL 查询，一条路走到底
+- **用 Neo4j**：通过 n10s 把 RDF **导入转成属性图**，之后用 Cypher 查 — SPARQL 只在导入前用来验证/探索原始数据时用一下
+
+**一句话**：Neo4j 的世界观是属性图 + Cypher，SPARQL 是 RDF 世界的东西。两者解决同类问题但路径不同，Neo4j 不需要 SPARQL，n10s 的作用就是让你**不再需要** SPARQL。
+
+---
+
+## 十、n10s + native 双库协同查询架构
+
+### 10.1 为什么要分两个库
+
+- **ontology_db（n10s 语义库）**：存本体定义、类层级、属性约束、标签词典
+- **native_db（业务图库）**：存实际业务数据（客户、联系人、关系）、向量索引、GDS 投影
+
+分库的好处：
+- 语义层和业务层隔离，互不干扰
+- 本体更新不影响业务数据
+- 业务库可以独立做 GDS 投影和向量索引优化
+
+### 10.2 核心痛点：Cypher 不支持跨库查询
+
+Neo4j 支持单实例多数据库，但 **Cypher 原生不支持跨库查询**。不能写 `MATCH (n:ONTOLOGY.Customer) ... (d:NATIVE.User)` 这种跨库语句。这是架构上必须解决的核心问题。
+
+### 10.3 双库数据分层
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  Neo4j 实例（单实例多库）                                       │
+│                                                               │
+│  数据库 A: ontology_db（n10s 语义库）                           │
+│  ├── 本体类定义（Customer、EnterpriseCustomer）                │
+│  ├── 属性约束（SHACL）                                        │
+│  ├── 类层级关系（rdfs:subClassOf）                             │
+│  └── 标签词典（中英文映射，供 Text-to-Cypher 查）              │
+│                                                               │
+│  数据库 B: native_db（业务图库）                                │
+│  ├── 实际业务数据（客户节点、联系人、关系）                     │
+│  ├── 向量索引（Embedding）                                    │
+│  ├── GDS 图投影（算法用）                                     │
+│  └── 全量 ETL 同步自 MySQL                                    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 10.4 跨库协同三种方案
+
+| 维度 | A 应用层编排 | B Fabric | C 元数据同步 |
+|------|------------|---------|------------|
+| 复杂度 | 低 | 中 | 低 |
+| 实时性 | 实时 | 实时 | 有延迟（分钟级） |
+| 企业版要求 | 否 | **是** | 否 |
+| 跨库 JOIN | 应用层合并 | 不支持 | 无需求（元数据已在业务库）|
+| 运维负担 | 低 | 中 | 需维护同步任务 |
+| 推荐场景 | 查询复杂、实时性要求高 | 已有企业版、简单场景 | 本体变化不频繁 |
+
+**实际建议**：A + C 组合。元数据同步解决 Text-to-Cypher 词典查询（高频），应用层编排处理深度组合查询（低频但复杂）。
+
+---
+
+## 十一、方案 A：应用层编排（推荐，90% 场景够用）
+
+最简单也最可控：Python 层分别查两个库，在内存中合并结果。
+
+代码路径：`code/neo4j-dual-db/cross_db_query.py`
+
+```python
+# code/neo4j-dual-db/cross_db_query.py
+
+from neo4j import AsyncGraphDatabase
+from dataclasses import dataclass
+from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class DualNeo4jConfig:
+    uri: str
+    user: str
+    password: str
+    ontology_db: str = "ontology_db"
+    native_db: str = "native_db"
+
+
+class CrossDBQueryService:
+    """双库协同查询服务：应用层编排"""
+
+    def __init__(self, config: DualNeo4jConfig):
+        self._driver = AsyncGraphDatabase.driver(
+            config.uri, auth=(config.user, config.password)
+        )
+        self._ontology_db = config.ontology_db
+        self._native_db = config.native_db
+
+    async def close(self):
+        await self._driver.close()
+
+    # ── 基础能力：指定库执行 Cypher ──────────────────────────
+
+    async def _run_on(self, db: str, cypher: str, params: dict = None):
+        """在指定数据库上执行 Cypher"""
+        async with self._driver.session(database=db) as session:
+            result = await session.run(cypher, parameters=params or {})
+            return [record.data() async for record in result]
+
+    async def query_ontology(self, cypher: str, params: dict = None):
+        return await self._run_on(self._ontology_db, cypher, params)
+
+    async def query_native(self, cypher: str, params: dict = None):
+        return await self._run_on(self._native_db, cypher, params)
+
+    # ── 场景 1：Text-to-Cypher 时查本体辅助 LLM ─────────────
+
+    async def get_ontology_hints(self, keyword: str) -> list[dict]:
+        """
+        查本体词典，返回标签/属性的中英文映射，
+        注入到 Text-to-Cypher 的 prompt 里，让 LLM 知道 cusName 是客户名称。
+        """
+        cypher = """
+        CALL n10s.ontoSearch.search($keyword)
+        YIELD term, uri, description
+        RETURN term, uri, description
+        LIMIT 20
+        """
+        try:
+            return await self.query_ontology(cypher, {"keyword": keyword})
+        except Exception as e:
+            logger.error(f"本体词典查询失败: keyword={keyword}, error={e}")
+            return []
+
+    async def get_class_hierarchy(self, class_name: str) -> list[dict]:
+        """
+        查某类的子类层级，
+        用于：用户问"查所有客户"时，自动展开到 EnterpriseCustomer + PersonalCustomer
+        """
+        cypher = """
+        MATCH path = (parent {name: $class_name})<-[:subClassOf*]-(child)
+        RETURN [n IN nodes(path) | n.name] AS hierarchy
+        """
+        return await self.query_ontology(cypher, {"class_name": class_name})
+
+    # ── 场景 2：查询业务数据前先用本体校验查询条件 ─────────────
+
+    async def get_required_properties(self, class_name: str) -> list[str]:
+        """从本体获取某类的必填属性列表"""
+        cypher = """
+        MATCH (c {name: $class_name})-[:hasProperty]->(p)
+        WHERE p.isRequired = true
+        RETURN p.name AS prop_name
+        """
+        rows = await self.query_ontology(cypher, {"class_name": class_name})
+        return [r["prop_name"] for r in rows]
+
+    # ── 场景 3：跨库组合查询（最核心的场景）─────────────────────
+
+    async def customer_full_profile(self, cus_name: str) -> dict:
+        """
+        完整客户画像：业务数据 + 语义元数据，跨库组装
+
+        步骤：
+        1. native_db 查业务数据（节点属性、关系）
+        2. ontology_db 查该类型的语义定义（应有属性、约束）
+        3. 合并，标记哪些字段缺失
+        """
+        # Step 1: 业务库查实际数据
+        native_cypher = """
+        MATCH (c:EnterpriseCustomer {cusName: $name})
+        OPTIONAL MATCH (c)-[r]->(related)
+        RETURN c {.cusName, .registerDate, .ratingGrade,
+                  .assetLiabilityRatio} AS customer,
+               collect({
+                   rel_type: type(r),
+                   target: labels(related)[0],
+                   target_name: coalesce(related.cusName, related.contactName)
+               }) AS relations
+        """
+        native_rows = await self.query_native(native_cypher, {"name": cus_name})
+        if not native_rows:
+            return {"error": f"未找到客户: {cus_name}"}
+
+        customer = native_rows[0]["customer"]
+        relations = native_rows[0]["relations"]
+
+        # Step 2: 本体库查该类型的应有属性
+        ontology_cypher = """
+        MATCH (c {name: 'EnterpriseCustomer'})-[:hasProperty]->(p)
+        RETURN p.name AS prop, p.description AS desc, 
+               coalesce(p.isRequired, false) AS required
+        """
+        ontology_rows = await self.query_ontology(ontology_cypher)
+
+        # Step 3: 合并，找出缺失字段
+        actual_props = set(k for k, v in customer.items() if v is not None)
+        completeness = []
+        for row in ontology_rows:
+            completeness.append({
+                "property": row["prop"],
+                "description": row["desc"],
+                "present": row["prop"] in actual_props,
+                "required": row["required"],
+            })
+
+        missing_required = [
+            c["property"] for c in completeness
+            if c["required"] and not c["present"]
+        ]
+
+        return {
+            "customer": customer,
+            "relations": relations,
+            "completeness": completeness,
+            "missing_required": missing_required,
+            "completeness_rate": (
+                f"{sum(1 for c in completeness if c['present']) "
+                f"/ len(completeness) * 100:.1f}%"
+                if completeness else "N/A"
+            ),
+        }
+
+    # ── 场景 4：SHACL 校验 + 业务数据修复 ──────────────────────
+
+    async def validate_and_report(self) -> dict:
+        """
+        用本体约束校验业务数据，返回违规列表
+        """
+        # Step 1: 在本体库跑 SHACL 校验
+        try:
+            shacl_result = await self.query_ontology(
+                "CALL n10s.shacl.validate() YIELD report RETURN report"
+            )
+            violations = shacl_result[0]["report"] if shacl_result else []
+        except Exception as e:
+            logger.error(f"SHACL 校验失败: {e}")
+            violations = []
+
+        # Step 2: 对违规项，到业务库取详细数据
+        issues = []
+        for v in violations[:50]:  # 限制处理量
+            detail_cypher = """
+            MATCH (n) WHERE elementId(n) = $node_id
+            RETURN labels(n) AS labels, properties(n) AS props
+            """
+            detail = await self.query_native(
+                detail_cypher, {"node_id": v.get("node_id", "")}
+            )
+            issues.append({"violation": v, "detail": detail[0] if detail else None})
+
+        return {"total_violations": len(violations), "issues": issues}
+
+
+# ── 使用示例 ──────────────────────────────────────────────────
+
+async def demo():
+    config = DualNeo4jConfig(
+        uri="bolt://localhost:7687",
+        user="neo4j",
+        password="your_password",
+    )
+    svc = CrossDBQueryService(config)
+    try:
+        profile = await svc.customer_full_profile("三一集团有限公司")
+        print(profile)
+    finally:
+        await svc.close()
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(demo())
+```
+
+---
+
+## 十二、方案 B：Neo4j Fabric 跨库视图（企业版）
+
+Fabric 是 Neo4j 企业版功能，可以在一条查询里引用不同数据库，用 `CALL` 过程桥接。
+
+代码路径：`code/neo4j-dual-db/fabric_bridge.py`
+
+```python
+# code/neo4j-dual-db/fabric_bridge.py
+
+from neo4j import AsyncGraphDatabase
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+class FabricBridge:
+    """
+    利用 Neo4j Fabric 做跨库查询。
+    
+    前置配置（需要在 Neo4j 中创建 Fabric 数据库）：
+    
+    CREATE DATABASE fabric;
+    
+    -- 在 fabric 数据库的 system 配置里注册两个分片：
+    -- fabric_endpoint_ontology → ontology_db
+    -- fabric_endpoint_native  → native_db
+    """
+
+    def __init__(self, driver, fabric_db: str = "fabric"):
+        self._driver = driver
+        self._fabric_db = fabric_db
+
+    async def cross_db_query(self, cus_name: str) -> list[dict]:
+        """
+        Fabric 跨库查询：
+        先查 native 库拿业务数据，再用结果查 ontology 库拿语义定义。
+        
+        注意：Fabric 的跨库是"串行调用"，不是 JOIN，
+        本质和方案 A 类似，但封装在数据库层。
+        """
+        cypher = """
+        // 先查 native 分片
+        USE fabric_endpoint_native
+        MATCH (c:EnterpriseCustomer {cusName: $name})
+        RETURN c.cusName AS name, c.ratingGrade AS rating,
+               c.assetLiabilityRatio AS debt_ratio,
+               id(c) AS node_id
+        
+        UNION
+        
+        // 再查 ontology 分片（独立结果，需要应用层合并）
+        USE fabric_endpoint_ontology
+        MATCH (c {name: 'EnterpriseCustomer'})-[:hasProperty]->(p)
+        RETURN p.name AS name, p.description AS rating, 
+               coalesce(p.isRequired, false) AS debt_ratio,
+               -1 AS node_id
+        """
+        async with self._driver.session(database=self._fabric_db) as session:
+            result = await session.run(cypher, parameters={"name": cus_name})
+            return [record.data() async for record in result]
+```
+
+### Fabric 的限制
+
+- 企业版才有（Community 版不支持）
+- 不能做跨库 JOIN，只能 UNION 或者多次 USE
+- 实际收益有限，复杂度却增加了
+
+---
+
+## 十三、方案 C：元数据同步（消除跨库需求）
+
+核心思路：**把本体库的元数据定期复制到业务库**，让业务库自给自足，彻底消除跨库查询。
+
+代码路径：`code/neo4j-dual-db/metadata_sync.py`
+
+```python
+# code/neo4j-dual-db/metadata_sync.py
+
+from neo4j import AsyncGraphDatabase
+import logging
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
+
+
+class OntologyMetadataSync:
+    """
+    定期把 ontology_db 的元数据同步到 native_db，
+    让业务库自带语义信息，查询不再需要跨库。
+    
+    同步内容：
+    - 类定义 → 变成 native_db 的 __MetaClass 节点
+    - 属性定义 → 变成 __MetaProperty 节点，挂到 __MetaClass 下
+    - 标签词典 → 注入 __MetaClass.label_zh / label_en
+    """
+
+    def __init__(self, driver, ontology_db: str, native_db: str):
+        self._driver = driver
+        self._ontology_db = ontology_db
+        self._native_db = native_db
+
+    async def sync_once(self) -> dict:
+        """执行一次全量元数据同步"""
+        # Step 1: 从本体库导出所有类定义
+        async with self._driver.session(database=self._ontology_db) as session:
+            result = await session.run("""
+                MATCH (c:Class)
+                OPTIONAL MATCH (c)-[:hasProperty]->(p:Property)
+                RETURN c.name AS class_name,
+                       c.label_zh AS label_zh,
+                       collect({
+                           prop: p.name,
+                           desc: p.description,
+                           required: coalesce(p.isRequired, false),
+                           datatype: p.datatype
+                       }) AS properties
+            """)
+            class_defs = [record.data() async for record in result]
+
+        logger.info(f"从本体库读取 {len(class_defs)} 个类定义")
+
+        # Step 2: 写入业务库
+        async with self._driver.session(database=self._native_db) as session:
+            # 清除旧元数据
+            await session.run("MATCH (n:__MetaClass) DETACH DELETE n")
+
+            # 写入新元数据
+            for cls in class_defs:
+                await session.run(
+                    """
+                    CREATE (mc:__MetaClass {
+                        name: $class_name,
+                        label_zh: $label_zh,
+                        synced_at: $synced_at
+                    })
+                    WITH mc
+                    UNWIND $properties AS prop
+                    CREATE (mp:__MetaProperty {
+                        name: prop.prop,
+                        description: prop.desc,
+                        required: prop.required,
+                        datatype: prop.datatype
+                    })
+                    CREATE (mc)-[:hasProperty]->(mp)
+                    """,
+                    parameters={
+                        "class_name": cls["class_name"],
+                        "label_zh": cls["label_zh"],
+                        "synced_at": datetime.now().isoformat(),
+                        "properties": cls["properties"],
+                    },
+                )
+
+        logger.info(f"元数据同步完成: {len(class_defs)} 个类")
+        return {
+            "synced_classes": len(class_defs),
+            "synced_at": datetime.now().isoformat(),
+        }
+
+    async def get_class_metadata_in_native(self, class_name: str) -> list[dict]:
+        """
+        同步后，业务库直接查元数据，无需跨库。
+        Text-to-Cypher 时用这个替代方案 A 的 get_ontology_hints。
+        """
+        async with self._driver.session(database=self._native_db) as session:
+            result = await session.run(
+                """
+                MATCH (mc:__MetaClass {name: $class_name})-[:hasProperty]->(mp)
+                RETURN mp.name AS prop, mp.description AS desc,
+                       mp.required AS required, mp.datatype AS datatype
+                """,
+                parameters={"class_name": class_name},
+            )
+            return [record.data() async for record in result]
+
+
+# ── 定时任务（用 APScheduler 或 cron）────────────────────────
+
+async def scheduled_sync():
+    """每小时同步一次"""
+    driver = AsyncGraphDatabase.driver(
+        "bolt://localhost:7687", auth=("neo4j", "password")
+    )
+    syncer = OntologyMetadataSync(driver, "ontology_db", "native_db")
+    try:
+        result = await syncer.sync_once()
+        logger.info(f"定时同步完成: {result}")
+    finally:
+        await driver.close()
+```
+
+---
+
+## 十四、双库架构文件结构总结
+
+```
+code/neo4j-dual-db/
+├── cross_db_query.py    → 方案 A：应用层编排（核心）
+├── fabric_bridge.py     → 方案 B：Fabric 跨库（企业版）
+└── metadata_sync.py     → 方案 C：元数据同步（消除跨库）
+```
+
+### 与第八章架构的关系
+
+```
+用户提问
+    │
+    ▼
+ChatOrchestrator（意图识别）
+    │
+    ├── 精确查询类 → Text-to-Cypher
+    │                └─ 查 native_db（方案C 已同步元数据，无需跨库）
+    │
+    ├── 语义搜索类 → GraphRAG
+    │                └─ 查 native_db 向量索引
+    │
+    ├── 深度分析类 → 两者结合
+    │                └─ 查 native_db（图遍历 + 向量检索）
+    │
+    ├── 推理/校验类 → 推理引擎
+    │                ├─ SHACL 校验 → ontology_db（方案A 跨库编排）
+    │                └─ 业务规则 → native_db
+    │
+    └── 元数据查询类 → ontology_db（本体词典、类层级）
+                     └─ 或通过方案C 在 native_db 查 __MetaClass

@@ -1,0 +1,222 @@
+[
+  {
+    "modelId": "MIT/ast-finetuned-audioset-10-10-0.4593",
+    "pipeline_tag": "audio-classification",
+    "likes": 360,
+    "downloads": 521654,
+    "author": "MIT",
+    "lastModified": "2022-11-14T18:41:48.000Z",
+    "tags": ["transformers", "pytorch", "safetensors", "audio-spectrogram-transformer", "audio-classification", "arxiv:2104.01778", "license:bsd-3-clause", "endpoints_compatible", "deploy:azure", "region:us"],
+    "animalRelated": true,
+    "note": "AudioSet预训练AST模型，527类中包含动物声音类别(dog/bird/cat等)"
+  },
+  {
+    "modelId": "laion/clap-htsat-fused",
+    "pipeline_tag": "audio-classification",
+    "likes": 114,
+    "downloads": 11532644,
+    "author": "laion",
+    "lastModified": "2026-01-12T00:00:00.000Z",
+    "tags": ["zero-shot audio classification", "zero-shot audio retrieval", "feature-extraction", "transformers", "arxiv:2211.06687", "region:us"],
+    "animalRelated": true,
+    "note": "零样本音频分类模型，可通过文本提示对任意动物声音进行分类"
+  },
+  {
+    "modelId": "EarthSpeciesProject/NatureLM-audio",
+    "pipeline_tag": null,
+    "likes": 34,
+    "downloads": 1819,
+    "author": "EarthSpeciesProject",
+    "lastModified": "2025-03-07T10:06:40.000Z",
+    "tags": ["safetensors", "EarthSpeciesProject", "NatureLM", "arxiv:2411.07186", "arxiv:1910.09700", "license:cc-by-nc-sa-4.0", "endpoints_compatible", "region:us"],
+    "animalRelated": true,
+    "note": "生物声学基础模型，基于Llama-3.1-8B，专为动物声音理解设计"
+  },
+  {
+    "modelId": "bookbot/distil-ast-audioset",
+    "pipeline_tag": "audio-classification",
+    "likes": 24,
+    "downloads": 271,
+    "author": "bookbot",
+    "lastModified": "2023-03-20T09:41:54.000Z",
+    "tags": ["transformers", "pytorch", "tensorboard", "safetensors", "audio-spectrogram-transformer", "audio-classification", "generated_from_trainer", "en", "arxiv:2104.01778", "license:apache-2.0", "endpoints_compatible", "region:us"],
+    "animalRelated": true,
+    "note": "AudioSet蒸馏AST模型，覆盖动物声音等527个音频类别"
+  },
+  {
+    "modelId": "MIT/ast-finetuned-audioset-14-14-0.443",
+    "pipeline_tag": "audio-classification",
+    "likes": 6,
+    "downloads": 24287,
+    "author": "MIT",
+    "lastModified": "2022-11-14T19:05:12.000Z",
+    "tags": ["transformers", "pytorch", "safetensors", "audio-spectrogram-transformer", "audio-classification", "arxiv:2104.01778", "license:bsd-3-clause", "endpoints_compatible", "deploy:azure", "region:us"],
+    "animalRelated": true,
+    "note": "AudioSet AST变体(14层)，含动物声音类别"
+  },
+  {
+    "modelId": "MIT/ast-finetuned-audioset-10-10-0.450",
+    "pipeline_tag": "audio-classification",
+    "likes": 4,
+    "downloads": 56,
+    "author": "MIT",
+    "lastModified": "2022-11-14T18:46:15.000Z",
+    "tags": ["transformers", "pytorch", "safetensors", "audio-spectrogram-transformer", "audio-classification", "arxiv:2104.01778", "license:bsd-3-clause", "endpoints_compatible", "deploy:azure", "region:us"],
+    "animalRelated": true,
+    "note": "AudioSet AST变体，含动物声音类别"
+  },
+  {
+    "modelId": "saurabhati/DASS_medium_AudioSet_50.2",
+    "pipeline_tag": "audio-classification",
+    "likes": 4,
+    "downloads": 508,
+    "author": "saurabhati",
+    "lastModified": "2025-04-26T19:50:51.000Z",
+    "tags": ["transformers", "safetensors", "dass", "audio-classification", "PyTorch", "State-space", "Mamba", "custom_code", "license:bsd-3-clause", "region:us"],
+    "animalRelated": true,
+    "note": "AudioSet训练的DASS状态空间模型，覆盖动物声音等类别"
+  },
+  {
+    "modelId": "justinchuby/BirdNET-onnx",
+    "pipeline_tag": null,
+    "likes": 3,
+    "downloads": 254,
+    "author": "justinchuby",
+    "lastModified": "2025-12-18T18:38:20.000Z",
+    "tags": ["tflite", "onnx", "audio", "bird", "nature", "science", "vocalization", "bio", "birds-classification", "bioacoustics", "license:cc", "region:us"],
+    "animalRelated": true,
+    "note": "BirdNET ONNX导出模型，专门用于鸟类声音分类识别"
+  },
+  {
+    "modelId": "ALM/hubert-base-audioset",
+    "pipeline_tag": "audio-classification",
+    "likes": 3,
+    "downloads": 138,
+    "author": "ALM",
+    "lastModified": "2023-08-29T13:36:58.000Z",
+    "tags": ["transformers", "pytorch", "hubert", "feature-extraction", "music", "audio", "speech", "audio-representation-learning", "arch-benchmark", "general-audio", "audio-classification", "arxiv:2405.00934", "license:cc-by-nc-sa-4.0", "endpoints_compatible", "deploy:azure", "region:us"],
+    "animalRelated": true,
+    "note": "HuBERT在AudioSet上微调，通用音频分类含动物声音"
+  },
+  {
+    "modelId": "ALM/wav2vec2-base-audioset",
+    "pipeline_tag": "audio-classification",
+    "likes": 2,
+    "downloads": 93,
+    "author": "ALM",
+    "lastModified": "2023-09-05T15:35:51.000Z",
+    "tags": ["transformers", "pytorch", "wav2vec2", "pretraining", "music", "audio", "speech", "audio-representation-learning", "arch-benchmark", "general-audio", "audio-classification", "arxiv:2405.00934", "license:cc-by-nc-sa-4.0", "endpoints_compatible", "deploy:azure", "region:us"],
+    "animalRelated": true,
+    "note": "wav2vec2在AudioSet上预训练，通用音频分类含动物声音"
+  },
+  {
+    "modelId": "NischayDnk/birdclef2026-rajuly-xc-pseudo-top3514",
+    "pipeline_tag": null,
+    "likes": 1,
+    "downloads": 0,
+    "author": "NischayDnk",
+    "lastModified": "2026-05-28T07:00:33.000Z",
+    "tags": ["none", "birdclef", "bioacoustics", "pseudo-labels", "multilabel", "weak-supervision", "license:cc-by-4.0", "region:us"],
+    "animalRelated": true,
+    "note": "BirdCLEF 2026竞赛模型，鸟类物种多标签分类，伪标签+弱监督"
+  },
+  {
+    "modelId": "EarthSpeciesProject/esp-aves2-sl-beats-all",
+    "pipeline_tag": null,
+    "likes": 1,
+    "downloads": 0,
+    "author": "EarthSpeciesProject",
+    "lastModified": "2026-01-20T00:00:00.000Z",
+    "tags": ["AVEX", "Bioacoustics", "BEATs", "arxiv:2508.11845", "license:cc-by-nc-sa-4.0", "region:us"],
+    "animalRelated": true,
+    "note": "AVES2生物声学模型，BEATs架构，全量数据训练"
+  },
+  {
+    "modelId": "EarthSpeciesProject/esp-aves2-sl-beats-bio",
+    "pipeline_tag": null,
+    "likes": 1,
+    "downloads": 0,
+    "author": "EarthSpeciesProject",
+    "lastModified": "2026-01-27T00:00:00.000Z",
+    "tags": ["AVEX", "Bioacoustics", "BEATs", "arxiv:2508.11845", "license:cc-by-nc-sa-4.0", "region:us"],
+    "animalRelated": true,
+    "note": "AVES2生物声学模型，BEATs架构，仅生物声学数据训练"
+  },
+  {
+    "modelId": "tphakala/BirdNET-Geomodel",
+    "pipeline_tag": null,
+    "likes": 1,
+    "downloads": 0,
+    "author": "tphakala",
+    "lastModified": "2026-05-12T00:00:00.000Z",
+    "tags": ["onnx", "region:us"],
+    "animalRelated": true,
+    "note": "BirdNET地理位置辅助模型，通过地理先验提高鸟类分类准确率"
+  },
+  {
+    "modelId": "tphakala/BirdNET-v2.4",
+    "pipeline_tag": "audio-classification",
+    "likes": 0,
+    "downloads": 0,
+    "author": "tphakala",
+    "lastModified": "2026-06-25T00:00:00.000Z",
+    "tags": ["onnx", "audio", "audio-classification", "bioacoustics", "birds", "birdnet", "license:cc-by-nc-sa-4.0", "region:us"],
+    "animalRelated": true,
+    "note": "BirdNET v2.4 ONNX模型，鸟类物种音频分类"
+  },
+  {
+    "modelId": "sammlapp/BirdNET_v2.4",
+    "pipeline_tag": null,
+    "likes": 0,
+    "downloads": 290,
+    "author": "sammlapp",
+    "lastModified": "2026-06-23T00:00:00.000Z",
+    "tags": ["tf-keras", "tflite", "license:cc-by-nc-sa-4.0", "region:us"],
+    "animalRelated": true,
+    "note": "BirdNET v2.4 TFLite/Keras模型，鸟类物种分类"
+  },
+  {
+    "modelId": "biodiversica/BirdNET-onnx-backbone",
+    "pipeline_tag": "feature-extraction",
+    "likes": 0,
+    "downloads": 0,
+    "author": "biodiversica",
+    "lastModified": "2026-05-07T00:00:00.000Z",
+    "tags": ["onnx", "audio", "bird", "nature", "bioacoustics", "embeddings", "backbone", "feature-extraction", "license:cc-by-nc-4.0", "region:us"],
+    "animalRelated": true,
+    "note": "BirdNET ONNX特征提取骨干网络，用于鸟类声音嵌入"
+  },
+  {
+    "modelId": "nmks/distilhubert-finetuned-birdclef",
+    "pipeline_tag": "audio-classification",
+    "likes": 0,
+    "downloads": 18,
+    "author": "nmks",
+    "lastModified": "2024-04-16T20:05:55.000Z",
+    "tags": ["transformers", "tensorboard", "safetensors", "hubert", "audio-classification", "generated_from_trainer", "license:apache-2.0", "model-index", "endpoints_compatible", "region:us"],
+    "animalRelated": true,
+    "note": "DistilHuBERT在BirdCLEF数据集上微调，鸟类声音分类"
+  },
+  {
+    "modelId": "krut42/perch-bird-mobile",
+    "pipeline_tag": null,
+    "likes": 0,
+    "downloads": 26,
+    "author": "krut42",
+    "lastModified": "2026-06-22T09:44:10.000Z",
+    "tags": ["tflite", "region:us"],
+    "animalRelated": true,
+    "note": "Google Perch鸟类声音模型移动端TFLite导出"
+  },
+  {
+    "modelId": "EarthSpeciesProject/esp-aves2-naturelm-audio-v1-beats",
+    "pipeline_tag": null,
+    "likes": 0,
+    "downloads": 0,
+    "author": "EarthSpeciesProject",
+    "lastModified": "2026-01-26T18:30:47.000Z",
+    "tags": ["EarthSpeciesProject", "AVEX", "Bioacoustics", "RepresentationLearning", "BEATs", "NatureLM", "arxiv:2508.11845", "license:cc-by-nc-sa-4.0", "region:us"],
+    "animalRelated": true,
+    "note": "AVES2+NatureLM+BEATs融合模型，生物声学表示学习"
+  }
+]
