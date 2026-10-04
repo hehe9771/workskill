@@ -1,0 +1,355 @@
+{
+  "language": "zh",
+  "full_text": "请不吝点赞 订阅 转发 打赏支持明镜与点点栏目用在哪里今天 这些都成为了企业的必答题而追问的终点始终清晰如何让好用的AI成为人人可用的普惠生产力以人为本我们推动技术加速发展的走向云算里 夯实智能基石大模型不断突破思考边界知识库沉淀数据与智慧智能体构建高效执行网络AI不再只是工具而是重构生产力的新基因当AI的脉搏与产业同频共振每个岗位都在见证新技术的成果在见证新技术的成果在新能力的跃进每个个体都在感受智能的温度而此刻的浪潮不过是未来图景的第一等联系以智为指正量人机协同的无限可能以云为重共赴全球市场的广阔天地以人为本智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大智 向远大",
+  "segments": [
+    {
+      "id": 0,
+      "start": 0.0,
+      "end": 29.98,
+      "text": "请不吝点赞 订阅 转发 打赏支持明镜与点点栏目",
+      "avg_logprob": -0.0094,
+      "no_speech_prob": 0.4507
+    },
+    {
+      "id": 1,
+      "start": 30.0,
+      "end": 31.38,
+      "text": "用在哪里",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 2,
+      "start": 31.38,
+      "end": 37.42,
+      "text": "今天 这些都成为了企业的必答题",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 3,
+      "start": 37.42,
+      "end": 41.34,
+      "text": "而追问的终点始终清晰",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 4,
+      "start": 41.34,
+      "end": 46.38,
+      "text": "如何让好用的AI成为人人可用的普惠生产力",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 5,
+      "start": 46.38,
+      "end": 49.24,
+      "text": "以人为本",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 6,
+      "start": 49.24,
+      "end": 52.76,
+      "text": "我们推动技术加速发展的走向",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 7,
+      "start": 52.76,
+      "end": 57.22,
+      "text": "云算里 夯实智能基石",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 8,
+      "start": 58.76,
+      "end": 59.78,
+      "text": "大模型",
+      "avg_logprob": -0.1901,
+      "no_speech_prob": 0.0395
+    },
+    {
+      "id": 9,
+      "start": 59.78,
+      "end": 62.16,
+      "text": "不断突破思考边界",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 10,
+      "start": 62.16,
+      "end": 65.36,
+      "text": "知识库",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 11,
+      "start": 65.36,
+      "end": 67.74,
+      "text": "沉淀数据与智慧",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 12,
+      "start": 67.74,
+      "end": 72.28,
+      "text": "智能体",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 13,
+      "start": 72.28,
+      "end": 74.82,
+      "text": "构建高效执行网络",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 14,
+      "start": 74.82,
+      "end": 78.7,
+      "text": "AI不再只是工具",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 15,
+      "start": 78.7,
+      "end": 81.78,
+      "text": "而是重构生产力的新基因",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 16,
+      "start": 81.78,
+      "end": 85.58,
+      "text": "当AI的脉搏与产业同频共振",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 17,
+      "start": 85.58,
+      "end": 88.38,
+      "text": "每个岗位",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 18,
+      "start": 88.38,
+      "end": 89.34,
+      "text": "都在见证新技术的成果",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 19,
+      "start": 89.36,
+      "end": 89.76,
+      "text": "在见证新技术的成果",
+      "avg_logprob": -0.2229,
+      "no_speech_prob": 0.0064
+    },
+    {
+      "id": 20,
+      "start": 89.78,
+      "end": 90.78,
+      "text": "在新能力的跃进",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 21,
+      "start": 90.78,
+      "end": 95.36,
+      "text": "每个个体都在感受智能的温度",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 22,
+      "start": 95.36,
+      "end": 96.7,
+      "text": "而此刻的浪潮",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 23,
+      "start": 96.7,
+      "end": 100.16,
+      "text": "不过是未来图景的第一等联系",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 24,
+      "start": 100.16,
+      "end": 102.48,
+      "text": "以智为指",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 25,
+      "start": 102.48,
+      "end": 105.52,
+      "text": "正量人机协同的无限可能",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 26,
+      "start": 105.52,
+      "end": 107.32,
+      "text": "以云为重",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 27,
+      "start": 107.32,
+      "end": 110.6,
+      "text": "共赴全球市场的广阔天地",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 28,
+      "start": 110.6,
+      "end": 112.68,
+      "text": "以人为本",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 29,
+      "start": 112.68,
+      "end": 115.2,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 30,
+      "start": 115.2,
+      "end": 115.24,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 31,
+      "start": 115.24,
+      "end": 115.26,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 32,
+      "start": 115.26,
+      "end": 115.7,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 33,
+      "start": 115.7,
+      "end": 115.72,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 34,
+      "start": 115.72,
+      "end": 115.82,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 35,
+      "start": 115.82,
+      "end": 115.94,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 36,
+      "start": 115.94,
+      "end": 116.02,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 37,
+      "start": 116.02,
+      "end": 116.12,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 38,
+      "start": 116.12,
+      "end": 117.16,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 39,
+      "start": 117.16,
+      "end": 117.66,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 40,
+      "start": 117.66,
+      "end": 117.82,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 41,
+      "start": 117.82,
+      "end": 117.94,
+      "text": "智 向远大",
+      "avg_logprob": -0.3227,
+      "no_speech_prob": 0.0488
+    },
+    {
+      "id": 42,
+      "start": 117.94,
+      "end": 119.94,
+      "text": "智 向远大",
+      "avg_logprob": -0.4963,
+      "no_speech_prob": 0.0483
+    }
+  ],
+  "stats": {
+    "segment_count": 43,
+    "low_confidence_count": 0,
+    "mean_avg_logprob": -0.2693
+  }
+}

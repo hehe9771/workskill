@@ -17,3 +17,5 @@ neo4j-n10s/
 s2c-output/
 s2c-output.zip
 CCbf/
+# Playwright CLI output (may contain credentials)
+.playwright-cli/

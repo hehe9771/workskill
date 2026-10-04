@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>待办清单</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="app">
+    <h1>待办清单</h1>
+
+    <form id="add-form" aria-label="添加待办">
+      <input id="todo-input" type="text" placeholder="要做什么？" aria-label="待办内容">
+      <button type="submit">添加</button>
+    </form>
+    <p id="error" role="alert" hidden></p>
+
+    <nav id="filters" aria-label="过滤">
+      <a href="#all" data-filter="all" class="active">全部</a>
+      <a href="#active" data-filter="active">未完成</a>
+      <a href="#done" data-filter="done">已完成</a>
+    </nav>
+
+    <p id="counter" aria-label="统计"></p>
+
+    <ul id="todo-list" aria-label="待办列表"></ul>
+    <p id="empty" hidden>暂无待办</p>
+  </main>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -216,37 +216,11 @@ caveats：
 
 ---
 
-## 8. mattpocock skills（无版本号）
+## 8. mattpocock skills（v2.1.0 起为插件，无独立探测）
 
-技能目录仅 .md 文件，无 VERSION/package.json。三个探测入口：
+v2.1.0 起以 `mattpocock-skills@mattpocock` 插件安装（上游官方 marketplace：github.com/mattpocock/skills 的 `.claude-plugin/marketplace.json`，插件 version semver 形态如 1.2.3）。激活版本与更新后复核**并入 P* 插件通用流程**（§5 awk 解析 installed_plugins.json + cache 版本目录非空壳校验），无独立探测命令。
 
-### 8.1 skills-lock.json 基线
-
-```bash
-cp "$PROJECT_ROOT/skills-lock.json" "$SNAP_DIR/skills-lock.json"
-# 更新后 diff 定位哪些技能变了（每条含 source/sourceType/skillPath/computedHash）
-diff "$SNAP_DIR/skills-lock.json" "$PROJECT_ROOT/skills-lock.json"
-```
-
-**⚠️ lock 的 computedHash 与本地文件 sha256 不相等**（连 git status 未修改的 caveman 也不等，CRLF 原样与 LF 规范化都不等）——hash 语义不明，**禁止用作漂移判据**，只做 lock-vs-lock 对比。
-
-### 8.2 技能目录内容 hash（必须打实体目录）
-
-```bash
-find "$PROJECT_ROOT/.agents/skills/<skill>" -type f -print0 | sort -z | xargs -0 sha256sum | sha256sum
-```
-
-实测确定性：tdd hash=9261a318…（两次运行一致）；caveman hash 不同，文件数=3。
-
-**⚠️ 重要坑**：实体文件在 `<项目>/.agents/skills/<skill>/`（真实目录），`<项目>/.claude/skills/<skill>` 是指向它们的 symlink。find 默认不跟随 symlink，对 `.claude/skills/<skill>` 直接 find 返回 0 个文件（实测踩到），必须对 `.agents/skills` 实体目录 find 或加 `-L`。另 `.agents/skills` 还混有非 mattpocock 技能（docx/pdf/data-analysis 等），按 lock 键名过滤才精确。
-
-### 8.3 上游 HEAD（仅证"上游动了"）
-
-```bash
-git ls-remote https://github.com/mattpocock/skills.git HEAD | awk '{print $1}'
-```
-
-实测 HEAD=2ab958093e83e0ec752e6c1c5932da465bf23e0c（exit=0）。skills-lock.json 只存内容哈希、不存 commit pin，无法得到精确 A..B 提交范围。
+**历史背景（v2.0.0 及之前为 npx skills 项目级安装时的坑，现 S1 已移除，仅存档）**：实体文件在 `<项目>/.agents/skills/<skill>/`，`<项目>/.claude/skills/<skill>` 是 symlink，find 默认不跟随返回 0 文件（2026-08-05 实测）；skills-lock.json 的 computedHash 与本地 sha256 不相等（语义不明），曾禁止用作漂移判据。
 
 ---
 

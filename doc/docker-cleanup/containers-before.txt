@@ -1,0 +1,2 @@
+﻿super-information-redis-dev	redis:7-alpine	Up 4 hours
+super-information-mysql-dev	mysql:8.0	Up 10 hours

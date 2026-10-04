@@ -35,7 +35,7 @@ Phase 4 的 H3/H5 删除前再做一次条件拷贝（未快照才拷），双�
 | gstack | CHANGELOG.md awk 段提取（维护极好，L1 基本可得） | VERSION+HEAD 对比 / unshallow 后 git log | 仅 VERSION 对 |
 | specify-cli | commit_id 对 → compare API 提交列表 | 仅 commit_id A→B | 「无细粒度 changelog，仅 commit 范围，详见 github/spec-kit compare 链接」 |
 | playwright skills | Phase 0 旧装技能副本 vs 新包内技能 `diff -r` | — | 仅 hash 变化 |
-| mattpocock skills | lock diff 定位变更技能 → 变更技能 Phase 0 快照 `diff -r` | `git ls-remote` 上游 HEAD 仅证"上游动了" | 「技能 <名> 内容已变更，无版本号，diff 见附录」 |
+| mattpocock skills | 插件化（v2.1.0），走 P* 通用证据链：新版 cache CHANGELOG → gitCommitSha compare API | 上游 marketplace.json version | 「插件版本 1.2.3 → 1.3.0，变更见附录」 |
 
 已知证据质量实测（2026-08-05）：
 - ecc 有 CHANGELOG.md+VERSION（Keep-a-Changelog 风格、含历史版本）；superpowers 有 RELEASE-NOTES.md（51 个 `## vX` 段，新版目录即含旧版本说明）；claude-notifications-go 有高质量 CHANGELOG.md。
@@ -99,15 +99,14 @@ curl -s -m 15 "https://api.github.com/repos/$REPO/compare/$OLD...$NEW" \
 npm view @playwright/cli time --json   # 只给版本发布时间，给不了变更内容
 ```
 
-### 3.6 playwright / mattpocock skills diff（L1）
+### 3.6 playwright skills diff（L1）
 
 ```bash
 # playwright：Phase 0 旧装副本 vs 新包内权威技能
 diff -r "$SNAP_DIR/playwright-installed-skills/user" "$(npm root -g)/@playwright/cli/skills/playwright-cli"
-# mattpocock：先 lock diff 定位变更技能，再对变更技能做快照 diff
-diff "$SNAP_DIR/skills-lock.json" "$PROJECT_ROOT/skills-lock.json"
-diff -r "$SNAP_DIR/mattpocock-skills-before/<skill>" "$PROJECT_ROOT/.agents/skills/<skill>"
 ```
+
+> mattpocock 自 v2.1.0 起为插件（`mattpocock-skills@mattpocock`），走 P* 通用证据链（CHANGELOG / compare API / 目录 diff），无本节专属命令。
 
 ---
 

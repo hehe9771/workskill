@@ -1,18 +1,18 @@
 ---
 name: update-all
 description: 一键更新所有 Claude Code 环境组件 — 市场、插件、npm 全局工具、uv 工具、skills。逐组件记录更新结果与版本变迁(from→to)，更新后验证，分析功能差异，并在 doc/update-reports/ 生成更新报告。
-version: 2.0.0
+version: 2.4.0
 source: project-init
 allowed-tools: Bash(claude:*) Bash(npm:*) Bash(npx:*) Bash(uv:*) Bash(playwright-cli:*) Bash(specify:*) Bash(git:*) Bash(pnpm:*) Bash(bash:*) Bash(curl:*) Bash(rm:*) Bash(mv:*) Bash(cp:*) Bash(find:*) Bash(cat:*) Bash(ls:*) Bash(awk:*) Bash(sed:*) Bash(grep:*) Bash(mkdir:*) Bash(date:*) Bash(diff:*) Bash(wc:*) Bash(head:*) Bash(timeout:*) Bash(tail:*) Bash(sort:*) Bash(xargs:*) Bash(sha256sum:*) Bash(basename:*) Bash(dirname:*) Bash(uname:*) Bash(test:*) Bash(cmp:*) Read Write
 ---
 
 # 一键更新所有环境组件
 
-v2.0.0 在 v1.4.0「更新 + 验证」基础上新增四项能力：
-1. **版本追踪**：逐组件记录是否更新、更新是否成功、版本变迁 from → to；
-2. **更新后验证**：统一重探 to 版本 + 功能验证，判定 7 态富状态；
-3. **功能差异分析**：定向采集 changelog/commit/diff 证据（三级降级链，禁止臆测）；
-4. **更新报告**：无条件在 `doc/update-reports/` 生成中文更新报告（含新增功能举例）。
+v2.4.0 变更（2026-09-18，命令副本收敛事件固化）：Phase 2 新增命令重名检测（坑 7）：用户级 `~/.claude/commands` 与已装插件 commands 交集 → WARN 同名双套行为；退役命令副本自动清理（坑 7b，`references/cleanup-retired-commands.sh`：与上游退役前版本逐字节一致则自动移除，不一致 WARN 留人工）；历史变更（v2.0.0-v2.2.0）拆分至 `references/CHANGELOG.md`。
+
+v2.3.0 变更（2026-09-18，mattpocock 文档漂移事件固化）：Phase 2 新增文档漂移预警（坑 6）：插件版本 from≠to → WARN 人工核对引用其版本/技能清单的文档；防坑清单扩至 6 坑；事件记录见项目 `doc/claude-code/插件安装与迁移记录.md`。
+
+v2.2.0 及更早变更（v2.2.0 对账预检、v2.1.0 mattpocock 插件化、v2.0.0 版本追踪/验证/差异/报告四能力）：见 `references/CHANGELOG.md`。
 
 ## 触发条件
 
@@ -73,9 +73,9 @@ Phase 0  预检 + 更新前快照          [新增 · 纯只读 · 幂等]
    ▼
 Phase 1  执行更新                  [黑名单门控 · 单步失败不中断 · 每命令经 run_cmd 留痕]
    │     N1 → N2 → G1 gstack → P1（须在 N2 之后）→ U1 specify-cli（含 rm 残留 exe）
-   │     → M* marketplaces（一条命令 9 市场）→ P* plugins ×6（逐个更新）
-   │     → R1 symlink 退化修复（插件更新后：更新可能重新引入退化）→ E1 ECC 同步（紧跟 ecc）→ S1 mattpocock skills（退出码必须检查）
-   │     → C1 superpowers 副本清理（单点收尾，收敛原 2.5/7/H8）
+   │     → M* marketplaces（一条命令 10 市场）→ P* plugins ×36（逐个更新）
+   │     → R1 symlink 退化修复（插件更新后：更新可能重新引入退化）→ E1 ECC 同步（紧跟 ecc）
+   │     → C1 superpowers 副本清理（防御性收尾，收敛原 2.5/7/H8）
    ▼
 Phase 2  更新后验证 + 状态判定      [只读探测]
    │     统一重探全部 to 版本 → 决策表判定 7 态 → 写 V- 复核行入 results.tsv
@@ -97,7 +97,7 @@ Phase 5  报告生成 + 终端汇总        [无条件执行]
 |---|---|---|
 | gstack.bak（上一代版本证据） | G1 内部第一步 `rm -rf gstack.bak`（更新**过程中**即销毁） | Phase 0 快照 bak 的 VERSION+HEAD |
 | 市场旧 HEAD | `marketplace update` = 删除+重克隆，reflog 无旧 HEAD | Phase 0 逐市场 `rev-parse HEAD`（完整 SHA） |
-| orphan 插件目录内 CHANGELOG / notifications-go 缺 exe 版本目录 | H5 清理全部 orphan、H3 清残缺目录（现存实例：notifications-go 1.40.1 orphan 含 1.39.3→1.40.1 完整 changelog） | Phase 3 第一步 orphan 抢救 + Phase 4 删除前条件拷贝双保险 |
+| orphan 插件目录内 CHANGELOG / notifications-go 缺 exe 版本目录 | H5 清理全部 orphan、H3 先 install.sh 自愈、不可修复才清残缺目录（现存实例：notifications-go 1.40.1 orphan 含 1.39.3→1.40.1 完整 changelog） | Phase 3 第一步 orphan 抢救 + Phase 4 删除前条件拷贝双保险 |
 | playwright 旧已装技能 | `install --skills` 一跑即覆盖 | Phase 0 整目录副本 |
 | superpowers 用户级副本 VERSION | C1 删除 | Phase 0 快照 VERSION |
 | npm/uv/npx 旧版本 | 全部原地覆盖无残留 | Phase 0 manifest/版本快照 |
@@ -131,11 +131,10 @@ Claude Code Bash 工具跨调用不保留 shell 状态（cwd 也重置），因�
 | G1 | `git/gstack` | git clone | VERSION + HEAD | `cat VERSION`（先 `[ -d ]` 判空）+ `rev-parse --short HEAD`；**.bak 同法，赶在 G1 删它之前** | bak 轮换 → `git clone --single-branch --depth 1 https://github.com/garrytan/gstack.git ~/.claude/skills/gstack` → `(cd ... && ./setup)` 子 shell | `.git/HEAD` + `setup` 存在 + 新 VERSION 可读 + setup 退出码 | 新目录 CHANGELOG.md awk 段提取；跨 clone git 对比不可行（对象库不相交，实测），unshallow 后 git log 列为可选 |
 | P1 | `skill/playwright-cli-skills` | skill | 工具 semver + 技能目录 hash | `playwright-cli --version 2>&1 \| grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' \| head -1`（行首锚定；**禁止 grep "version"**）+ 技能目录 sha256 | `playwright-cli install --skills` | exit 0 + 已装 SKILL.md 与包内权威文件 cmp 一致 + stderr 无版本不匹配警告框 | Phase 0 旧装技能副本 vs 新包内 skills 的 `diff -r`（install 一跑旧文件即覆盖，Phase 0 快照是唯一旧版） |
 | U1 | `uv/specify-cli` | uv | 显示版本串 + **commit_id（对比键）** | `uv tool list \| sed` 剥 v 前缀；对比键取 dist-info 内 `direct_url.json` 的 `commit_id`（grep/sed，无 jq） | `rm -f ~/.local/bin/specify.exe`（教训驱动）→ `uv tool install specify-cli --from "git+https://github.com/github/spec-kit.git" --reinstall` | `uv tool list` 含 specify-cli + `specify --version` 可运行 | commit_id A→B → GitHub compare API（github/spec-kit）；无网络降级"仅 commit 范围 + compare 链接"（--reinstall 版本串恒为 dev，只有 commit 能区分） |
-| M* | `mkt/<名称>` ×9（git 型 8 + GCS 型 claude-plugins-official） | marketplace | git HEAD 全 SHA / gcs-sha | 逐市场先判型：`git -C "$d" rev-parse --git-dir` → `rev-parse HEAD`（**存完整 SHA**）；否则 `.gcs-sha`；两者皆非 → unknown | `claude plugins marketplace update`（实测=删除+重克隆） | update exit 0 + 重探 HEAD/sha 可读 + marketplace list 含该市场 | git 型：旧 HEAD vs 新 HEAD，`fetch --unshallow` 后 `git log OLD..NEW`；降级 compare API。GCS 型：`.gcs-sha` diff + marketplace.json diff，细节下沉插件层 |
-| P* | `plugin/<名@市场>` ×6：claude-hud@claude-hud、ecc@ecc、superpowers@claude-plugins-official、understand-anything@understand-anything、ui-ux-pro-max@ui-ux-pro-max-skill、jobs-to-be-done@pm-skills | plugin | manifest version（semver 或 SHA 形态） | **权威源**：`awk -F'"'` 解析 installed_plugins.json（单插件按 key 过滤） | 逐个 `claude plugins update <p>@<mkt>` | 命令退出码 + manifest 版本对比 + 版本目录存在且**非空壳**（`find <dir> -type f \| head -1` 非空） | 新版 cache 目录 CHANGELOG/RELEASE-NOTES 的 from→to 段 → manifest gitCommitSha compare API → 新旧目录文件清单 diff |
-| S1 | `skill/mattpocock-skills` | skill | skills-lock 内容 + 目录 sha256 | `cp skills-lock.json` 基线 + 逐技能对 **`.agents/skills` 实体目录** find+sha256（.claude/skills 下是 symlink，直接 find 返回 0 文件——实测踩到）+ 上游 `git ls-remote HEAD` | `npx skills@latest add mattpocock/skills`（**退出码必须检查**，v1.4.0 验证形同虚设） | exit 0 + lock 可解析 + 变更技能实体目录存在非空 | Phase 0 lock 副本 vs 现 lock 的 diff + 技能目录快照 diff。**lock 的 computedHash 与本地 sha256 不相等（语义不明），禁止用作漂移判据** |
+| M* | `mkt/<名称>` ×10（git 型 9 + GCS 型 claude-plugins-official；v2.1.0 新增 mattpocock） | marketplace | git HEAD 全 SHA / gcs-sha | 逐市场先判型：`git -C "$d" rev-parse --git-dir` → `rev-parse HEAD`（**存完整 SHA**）；否则 `.gcs-sha`；两者皆非 → unknown | `claude plugins marketplace update`（实测=删除+重克隆） | update exit 0 + 重探 HEAD/sha 可读 + marketplace list 含该市场 | git 型：旧 HEAD vs 新 HEAD，`fetch --unshallow` 后 `git log OLD..NEW`；降级 compare API。GCS 型：`.gcs-sha` diff + marketplace.json diff，细节下沉插件层 |
+| P* | `plugin/<名@市场>` ×36：claude-hud@claude-hud、ecc@ecc、superpowers@claude-plugins-official、understand-anything@understand-anything、ui-ux-pro-max@ui-ux-pro-max-skill、mattpocock-skills@mattpocock、pm-skills 市场插件 ×30（jobs-to-be-done、prd-development、discovery-process、product-strategy-session、roadmap-planning、market-landscape-scan、competitive-analysis-process、saas-revenue-growth-metrics、organic-growth-advisor + 2026-09-18 补装 21 个：problem-framing-canvas、discovery-interview-prep、opportunity-solution-tree、pol-probe-advisor、positioning-workshop、problem-statement、proto-persona、user-story、user-story-splitting、epic-hypothesis、prioritization-advisor、user-story-mapping、epic-breakdown-advisor、feature-investment-advisor、acquisition-channel-advisor、finance-based-pricing-advisor、recommendation-canvas、altitude-horizon-framework、director-readiness-advisor、vp-cpo-readiness-advisor、executive-onboarding-playbook） | plugin | manifest version（semver 或 SHA 形态） | **权威源**：`awk -F'"'` 解析 installed_plugins.json（单插件按 key 过滤） | 逐个 `claude plugins update <p>@<mkt>` | 命令退出码 + manifest 版本对比 + 版本目录存在且**非空壳**（`find <dir> -type f \| head -1` 非空） | 新版 cache 目录 CHANGELOG/RELEASE-NOTES 的 from→to 段 → manifest gitCommitSha compare API → 新旧目录文件清单 diff |
 | K0 | `cli/claude-code`（黑名单） | cli | semver | `claude --version 2>/dev/null \| grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' \| head -1` | **禁止更新**（只读记录） | — | 不采集；报告引用 doc/claude-code/ 系列 |
-| K1 | `plugin/claude-notifications-go`（黑名单） | plugin | manifest version | 同 P* awk（只读） | **禁止更新**；H3 残缺目录清理保留 | — | 其 orphan 目录 CHANGELOG 在 Phase 3 抢救 |
+| K1 | `plugin/claude-notifications-go`（黑名单） | plugin | manifest version | 同 P* awk（只读） | **禁止更新**；H3 先 install.sh 自愈、不可修复的残缺目录清理保留 | — | 其 orphan 目录 CHANGELOG 在 Phase 3 抢救 |
 
 ### 表 B：修复/同步类组件（状态走 REPAIRED/OK/FAILED）
 
@@ -143,14 +142,14 @@ Claude Code Bash 工具跨调用不保留 shell 状态（cwd 也重置），因�
 |---|---|---|---|---|
 | R1 | `fix/ui-ux-symlink`（原 2.6） | DEGRADED 检测（scripts/data 是文件非目录）→ 从 cache `src/ui-ux-pro-max/` 复制实体；**位于 P\* 之后**（插件更新可能重新引入退化） | `test -f $UI_SKILL/scripts/search.py` 实证（v1.4.0 验证范式标杆） | 修复成功=REPAIRED；未退化=OK；未安装=NOT_INSTALLED |
 | E1 | `sync/ecc`（原 6.5） | `(cd "$ECC_DIR" && bash install.sh --target claude --profile full)` + 按 `STALE_RULES_DIRS` 清理旧顶层 rules（单一变量，E1/H6 共用） | agents 数 ≥ cache 数 且 rules/ecc 数 ≥ cache 内规则目录数（**动态阈值，废弃魔法数字 20**） | 同步成功=REPAIRED；cache 缺失=NOT_INSTALLED |
-| C1 | `copy/superpowers`（原 2.5+7+H8 收敛） | **仅在 S1 之后执行一次**：`[ -d ~/.claude/skills/superpowers ] && rm -rf ~/.claude/skills/superpowers` | `[ ! -d ~/.claude/skills/superpowers ]` | 删除了=REPAIRED；本无副本=OK。副本 VERSION 已在 Phase 0 快照 |
+| C1 | `copy/superpowers`（原 2.5+7+H8 收敛） | **仅在 P* 之后执行一次（防御性）**：`[ -d ~/.claude/skills/superpowers ] && rm -rf ~/.claude/skills/superpowers` | `[ ! -d ~/.claude/skills/superpowers ]` | 删除了=REPAIRED；本无副本=OK。副本 VERSION 已在 Phase 0 快照 |
 
 ### 表 C：黑名单与范围外
 
 | 组件 | 处理 |
 |---|---|
 | K0 `@anthropic-ai/claude-code` | 禁止更新（兼容性需手动控版）；只读记录当前版本进 Phase 0 快照与报告附录；状态 BLACKLIST。 |
-| K1 `claude-notifications-go@claude-notifications-go` | 禁止更新（1.40.0 残缺版缺 Windows exe）；只读记录激活版本；H3 仍清理残缺目录；状态 BLACKLIST。 |
+| K1 `claude-notifications-go@claude-notifications-go` | 禁止更新（1.40.0 残缺版缺 Windows exe）；只读记录激活版本；H3 先 install.sh 自愈、不可修复的残缺目录仍清理；状态 BLACKLIST。 |
 | `claude-mem` | **不在管理范围，完全不碰**：不探测、不记录、不检查、无记录行；仅因 installed_plugins.json 整体 cp 被动出现在报告"环境快照"附录，标注"不在本技能管理范围"。改造中不得恢复对 claude-mem 的任何操作。 |
 
 > 「claude-mem 不在本技能管理范围内，完全跳过，不做任何检查或操作」——v1.4.0 安全决策注释原文保留。
@@ -287,7 +286,7 @@ ls -1dt "$EVIDENCE_ROOT"/2* 2>/dev/null | tail -n +4 | while read -r old; do
 
 PROJECT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 REPORT_DIR="${UPDATE_ALL_REPORT_DIR:-$PROJECT_ROOT/doc/update-reports}"
-SKILL_VERSION="2.0.0"
+SKILL_VERSION="2.2.0"
 cat > "$SNAP_DIR/meta" <<EOF
 START_TIME="$START_TIME"
 SNAP_DIR="$SNAP_DIR"
@@ -377,18 +376,6 @@ PKG_SKILLS="$(npm root -g 2>/dev/null)/@playwright/cli/skills"
 P1_HASH=$(find "$HOME/.claude/skills/playwright-cli" -type f -print0 2>/dev/null | sort -z | xargs -0 sha256sum 2>/dev/null | sha256sum | awk '{print $1}')
 echo "skill/playwright-cli-skills-hash=${P1_HASH:-unknown}" >> "$VB"
 
-# --- mattpocock skills（lock 基线 + 实体目录 hash；.claude/skills 是 symlink 不可直接 find）---
-cp "$PROJECT_ROOT/skills-lock.json" "$SNAP_DIR/skills-lock.json" 2>/dev/null
-mkdir -p "$SNAP_DIR/mattpocock-skills-before"
-: > "$SNAP_DIR/mattpocock-hashes.env"
-for s in "$PROJECT_ROOT"/.agents/skills/*/; do
-  n=$(basename "$s")
-  h=$(find "$s" -type f -print0 2>/dev/null | sort -z | xargs -0 sha256sum 2>/dev/null | sha256sum | awk '{print $1}')
-  echo "$n=$h" >> "$SNAP_DIR/mattpocock-hashes.env"
-  cp -r "$s" "$SNAP_DIR/mattpocock-skills-before/$n" 2>/dev/null
-done
-probe "skill/mattpocock-skills" "timeout 20 git ls-remote https://github.com/mattpocock/skills.git HEAD | awk '{print \$1}'"
-
 # --- superpowers 用户级副本 VERSION + npm 全局清单 + 环境快照 ---
 [ -d "$HOME/.claude/skills/superpowers" ] && cp "$HOME/.claude/skills/superpowers/VERSION" "$SNAP_DIR/superpowers-copy.VERSION" 2>/dev/null
 npm ls -g --depth=0 > "$SNAP_DIR/npm-global.txt" 2>&1
@@ -474,7 +461,8 @@ rc=$?
 upd M-all mkt/all present claude plugins marketplace update
 
 # --- P*：插件逐个更新（列表为登记表数据；持久化 plugins.list 单源，供 Phase 2 复核读取——变量不跨 Bash 调用）---
-PLUGINS_TO_UPDATE="claude-hud@claude-hud ecc@ecc superpowers@claude-plugins-official understand-anything@understand-anything ui-ux-pro-max@ui-ux-pro-max-skill jobs-to-be-done@pm-skills"
+# v2.1.0：mattpocock-skills 插件化（替代原 S1 npx skills 安装），pm-skills 市场全部 30 个已装插件
+PLUGINS_TO_UPDATE="claude-hud@claude-hud ecc@ecc superpowers@claude-plugins-official understand-anything@understand-anything ui-ux-pro-max@ui-ux-pro-max-skill mattpocock-skills@mattpocock jobs-to-be-done@pm-skills prd-development@pm-skills discovery-process@pm-skills product-strategy-session@pm-skills roadmap-planning@pm-skills market-landscape-scan@pm-skills competitive-analysis-process@pm-skills saas-revenue-growth-metrics@pm-skills organic-growth-advisor@pm-skills problem-framing-canvas@pm-skills discovery-interview-prep@pm-skills opportunity-solution-tree@pm-skills pol-probe-advisor@pm-skills positioning-workshop@pm-skills problem-statement@pm-skills proto-persona@pm-skills user-story@pm-skills user-story-splitting@pm-skills epic-hypothesis@pm-skills prioritization-advisor@pm-skills user-story-mapping@pm-skills epic-breakdown-advisor@pm-skills feature-investment-advisor@pm-skills acquisition-channel-advisor@pm-skills finance-based-pricing-advisor@pm-skills recommendation-canvas@pm-skills altitude-horizon-framework@pm-skills director-readiness-advisor@pm-skills vp-cpo-readiness-advisor@pm-skills executive-onboarding-playbook@pm-skills"
 printf '%s\n' $PLUGINS_TO_UPDATE > "$SNAP_DIR/plugins.list"
 for plugin in $PLUGINS_TO_UPDATE; do
   upd "P-${plugin%%@*}" "plugin/$plugin" "$(get_before "plugin/$plugin")" claude plugins update "$plugin"
@@ -543,26 +531,17 @@ else
 fi
 ```
 
-### S1：mattpocock skills + C1：superpowers 副本单点清理（原 7 + 2.5/7/H8 收敛）
+### C1：superpowers 副本单点清理（原 7 + 2.5/7/H8 收敛）
 
-> **问题根因（C1）**：`npx skills@latest add mattpocock/skills` 会在 `~/.claude/skills/superpowers/` 创建静态副本，与 plugin cache（`claude plugins update superpowers@claude-plugins-official`）完全独立。两套同时存在导致 Claude Code 可能加载旧版。
+> **问题根因（C1）**：`npx skills@latest add mattpocock/skills`（v2.0.0 及之前的 S1 步骤，v2.1.0 已移除）会在 `~/.claude/skills/superpowers/` 创建静态副本，与 plugin cache（`claude plugins update superpowers@claude-plugins-official`）完全独立。两套同时存在导致 Claude Code 可能加载旧版。
 >
-> **解决**：删除用户级副本，让 plugin cache 通过 plugin.json 自动加载。v2.0.0 将 v1.4.0 步骤 2.5/7/H8 三处重复清理收敛为 **S1 之后单点执行一次**（消除"先清理、7 重建、再清理"顺序矛盾）。
+> **解决**：删除用户级副本，让 plugin cache 通过 plugin.json 自动加载。v2.1.0 起 npx skills 不再运行，本步为**防御性清理**（手动跑其他技能包安装仍可能重建副本），位置在 P* 之后。
 
 ```bash
 # （通用前置 + 三函数 + get_before 重放后执行）
 get_before() { sed -n "s|^$1=||p" "$SNAP_DIR/versions-before.env" | head -1; }
 
-# --- S1：mattpocock skills（退出码必须检查——v1.4.0 两分支皆 PASS 验证形同虚设）---
-run_cmd S1 npx skills@latest add mattpocock/skills
-rc=$?
-if [ $rc -eq 0 ]; then
-  record_result "S1" "PASS" "npx skills add exit 0（退出码已检查）" "skill/mattpocock-skills" "$(get_before skill/mattpocock-skills)" "" "" "exit=0"
-else
-  record_result "S1" "FAIL" "npx skills add exit $rc（见 errors/S1.err）" "skill/mattpocock-skills" "$(get_before skill/mattpocock-skills)" "" "" "exit=$rc"
-fi
-
-# --- C1：superpowers 用户级副本清理（仅 S1 之后执行一次）---
+# --- C1：superpowers 用户级副本清理（防御性，P* 之后执行一次）---
 if [ -d "$HOME/.claude/skills/superpowers" ]; then
   CP_VER=$(cat "$SNAP_DIR/superpowers-copy.VERSION" 2>/dev/null || echo unknown)
   rm -rf "$HOME/.claude/skills/superpowers"
@@ -694,22 +673,24 @@ done
 EXPECT_N=$(wc -l < "$SNAP_DIR/plugins.list" 2>/dev/null); EXPECT_N=${EXPECT_N:-0}; GOT_N=$(awk -F'\t' '$1 ~ /^V-P-/' "$TSV" | wc -l)
 [ "$GOT_N" -eq "$EXPECT_N" ] || echo "[$(date '+%H:%M:%S')] [ERROR] [P*] V- 复核行数不符：期望 $EXPECT_N 实际 $GOT_N" >> "$LOG_FILE"
 
-# --- S1：lock 可解析 + 变更技能实体目录非空；to 探测网络可选化（timeout 20 + lock diff 降级）---
-lock_pairs() { awk -F'"' '/^    "[^"]+": \{/{n=$2} /"computedHash":/{if(n!="") print n"="$4}' "$1" 2>/dev/null | sort; }
-from=$(get_before "skill/mattpocock-skills"); S1_NOTE="lock 可解析"
-to=$(timeout 20 git ls-remote https://github.com/mattpocock/skills.git HEAD 2>/dev/null | awk '{print $1}')
-if [ -z "$to" ]; then   # 降级：ls-remote 超时/失败（离线/代理故障）→ 以 lock 内容作变化判定键，不误判 FAILED
-  from="lock:$(sha256sum "$SNAP_DIR/skills-lock.json" 2>/dev/null | awk '{print $1}' | cut -c1-12)"; to="lock:$(sha256sum "$PROJECT_ROOT/skills-lock.json" 2>/dev/null | awk '{print $1}' | cut -c1-12)"
-  S1_NOTE="ls-remote 不可用，降级 lock diff 判变化"; echo "[$(date '+%H:%M:%S')] [WARN] [S1] $S1_NOTE" >> "$LOG_FILE"
-fi
-vrc=0; [ -s "$PROJECT_ROOT/skills-lock.json" ] || vrc=1
-CHANGED=$(diff <(lock_pairs "$SNAP_DIR/skills-lock.json") <(lock_pairs "$PROJECT_ROOT/skills-lock.json") 2>/dev/null | awk '/^[<>]/{n=$2; sub(/=.*/,"",n); print n}' | sort -u)
-for sk in $CHANGED; do   # 变更技能实体目录须存在且非空（.claude/skills 是 symlink，打 .agents/skills 实体目录）
-  [ -d "$PROJECT_ROOT/.agents/skills/$sk" ] && [ -n "$(find "$PROJECT_ROOT/.agents/skills/$sk" -type f 2>/dev/null | head -1)" ] \
-    || { vrc=1; S1_NOTE="$S1_NOTE；$sk 实体目录缺失或空壳"; }
-done
-[ -n "$CHANGED" ] && S1_NOTE="$S1_NOTE；变更技能: $(echo "$CHANGED" | tr '\n' ' ')"
-judge S1 skill/mattpocock-skills "${from:-unknown}" "${to:-unknown}" "$(exit_of S1)" "$vrc" "$S1_NOTE"
+# --- 插件对账预检（v2.2.0 固化；坑清单见 references/plugin-pitfalls.md）---
+# 反向对账：已装但不在 PLUGINS_TO_UPDATE 清单 → WARN（防静默漏更新；排除黑名单/管理范围外）
+awk -F'"' '/@/ && /: \[/{print $2}' "$HOME/.claude/plugins/installed_plugins.json" 2>/dev/null | sort -u > "$SNAP_DIR/installed-all.list"
+sort "$SNAP_DIR/plugins.list" -o "$SNAP_DIR/plugins.list"
+comm -23 "$SNAP_DIR/installed-all.list" "$SNAP_DIR/plugins.list" \
+  | grep -v -e '^claude-notifications-go@' -e '^claude-mem@' -e '^paddle@' > "$SNAP_DIR/not-in-update-list.txt"
+[ -s "$SNAP_DIR/not-in-update-list.txt" ] \
+  && echo "[$(date '+%H:%M:%S')] [WARN] [P*] 以下已装插件不在 PLUGINS_TO_UPDATE 清单（每轮更新静默跳过），请同步扩登记表: $(tr '\n' ' ' < "$SNAP_DIR/not-in-update-list.txt")" >> "$LOG_FILE"
+# 死条目检测：enabledPlugins 标 true 但未安装（启用≠安装；典型根因=市场同名撞车或卸载残留）
+grep -o '"[^"]*@[^"]*": *true' "$HOME/.claude/settings.json" 2>/dev/null | sed 's/[": ]//g; s/true$//' | sort -u > "$SNAP_DIR/enabled.list"
+comm -23 "$SNAP_DIR/enabled.list" "$SNAP_DIR/installed-all.list" > "$SNAP_DIR/dead-enabled.txt"
+[ -s "$SNAP_DIR/dead-enabled.txt" ] \
+  && echo "[$(date '+%H:%M:%S')] [WARN] [P*] enabledPlugins 死条目（启用但未装）: $(tr '\n' ' ' < "$SNAP_DIR/dead-enabled.txt")；处置见 references/plugin-pitfalls.md 坑2/坑3" >> "$LOG_FILE"
+: > "$SNAP_DIR/plugins-version-changed.txt"; for plugin in $(cat "$SNAP_DIR/plugins.list" 2>/dev/null); do vfrom=$(get_before "plugin/$plugin"); vto=$(sed -n "s|^$plugin=||p" "$SNAP_DIR/plugin-versions-after.env" | head -1); [ -n "$vfrom" ] && [ -n "$vto" ] && [ "$vfrom" != "$vto" ] && echo "$plugin $vfrom->$vto" >> "$SNAP_DIR/plugins-version-changed.txt"; done
+[ -s "$SNAP_DIR/plugins-version-changed.txt" ] && echo "[$(date '+%H:%M:%S')] [WARN] [P*] 以下插件版本已变化，引用其版本号/技能清单/技能名的文档可能漂移（坑6，人工核对，处置与已知文档位置见 references/plugin-pitfalls.md）: $(tr '\n' ' ' < "$SNAP_DIR/plugins-version-changed.txt")" >> "$LOG_FILE"
+find "$HOME"/.claude/plugins/cache/*/*/*/commands -name '*.md' 2>/dev/null | sed 's|.*/||; s|\.md$||' | sort -u > "$SNAP_DIR/plugin-cmd-names.txt"; : > "$SNAP_DIR/cmd-collision.txt"; for f in "$HOME/.claude/commands/"*.md; do [ -e "$f" ] || continue; n=$(basename "$f" .md); grep -qix "$n" "$SNAP_DIR/plugin-cmd-names.txt" && echo "$n" >> "$SNAP_DIR/cmd-collision.txt"; done
+[ -s "$SNAP_DIR/cmd-collision.txt" ] && echo "[$(date '+%H:%M:%S')] [WARN] [P*] 用户级命令与插件命令重名（同名双套行为，坑7，人工核对，处置见 references/plugin-pitfalls.md）: $(tr '\n' ' ' < "$SNAP_DIR/cmd-collision.txt")" >> "$LOG_FILE"
+[ -f "$HOME/.claude/skills/update-all/references/cleanup-retired-commands.sh" ] && bash "$HOME/.claude/skills/update-all/references/cleanup-retired-commands.sh" >> "$LOG_FILE" 2>&1
 ```
 
 验证结果进报告 §5 表一；Phase 4 的 H 检查进 §5 表二。
@@ -756,7 +737,7 @@ git -C "$MKT" log --oneline "$OLD..$(git -C "$MKT" rev-parse HEAD)" 2>/dev/null 
 |---|---|---|---|
 | H1 | understand-anything dist 构建补救 | H1 | 保留 pnpm build 补救与残缺版背景注记；输出经 run_cmd 落盘（v1.4.0 `2>&1 >/dev/null` 重定向顺序错误致 stderr 泄漏，已修正） |
 | H2 | ui-ux symlink 终态断言 | H2（原 2.6 修复已移至 R1） | 与 R1 共用同一检测逻辑，终态只断言不重复修复 |
-| H3 | notifications-go 残缺目录清理 + 激活 exe 检查 | H3 | 位于 Phase 3 之后；删除前把待删目录内 CHANGELOG.md 再拷入 $SNAP（双保险）；残缺版教训注记原文保留 |
+| H3 | notifications-go 自愈 + 残缺目录清理 + 激活 exe 检查 | H3 | 位于 Phase 3 之后；缺 exe 目录先跑 install.sh 自愈（2026-08-05 补丁，1.40.1 事故）；不可修复者删除前把目录内 CHANGELOG.md 再拷入 $SNAP（双保险）；残缺版教训注记原文保留 |
 | H4 | claude-mem 移出管理范围占位注释 | H4 | 原文保留，**禁止借重构恢复任何 claude-mem 操作** |
 | H5 | orphan 抢救复查 + orphan/temp_git 清理 | H5+H7 合并 | 删除前逐个 orphan 目录条件拷贝 CHANGELOG/RELEASE-NOTES/VERSION 到 $SNAP/evidence/orphan/ |
 | H6 | ECC 漂移终检 | H6+6.5 验证合并 | 动态阈值（与 cache 实际目录数对比，废魔法数字 20）；旧顶层 rules 清理用 `STALE_RULES_DIRS` 单一变量 |
@@ -794,13 +775,23 @@ else
   record_result "H2" "SKIP" "ui-ux-pro-max 未安装" "fix/ui-ux-symlink" "" "" "NOT_INSTALLED" "-"
 fi
 
-# ===== H3: claude-notifications-go 残缺目录清理 + 激活 exe 检查 =====
-# 背景注记（残缺版教训）：1.40.0 上游发布缺 Windows exe，残缺版目录必须删除；激活版本以 installed_plugins.json 为准
+# ===== H3: claude-notifications-go 自愈 + 残缺目录清理 + 激活 exe 检查 =====
+# 背景注记（残缺版教训）：上游自 1.40.0 起不随包提供 Windows exe（bin/claude-notifications 是 33B darwin 桩）。
+# 缺 exe 时先跑 bin/install.sh 自愈；修复失败才判残缺：抢救 CHANGELOG 后删除；激活版本以 installed_plugins.json 为准
 NG="$HOME/.claude/plugins/cache/claude-notifications-go/claude-notifications-go"
 for v in "$NG"/*/; do
   if [ ! -f "$v/.orphaned_at" ] && [ ! -f "$v/bin/claude-notifications-windows-amd64.exe" ]; then
     bn=$(basename "$v")
-    # 双保险：删除前再拷一次 CHANGELOG（Phase 3 orphan 抢救可能未覆盖非 orphan 目录）
+    # 自愈优先：跑 install.sh 补装 Windows 二进制（2026-08-05 补丁，1.40.1 事故即以 install.sh 修复）
+    if [ -f "$v/bin/install.sh" ]; then
+      echo "[$(date '+%H:%M:%S')] [HEAL] [H3] $bn 缺 Windows exe，自动跑 install.sh" >> "$LOG_FILE"
+      (cd "$v" && bash bin/install.sh >> "$LOG_FILE" 2>&1)
+    fi
+    if [ -f "$v/bin/claude-notifications-windows-amd64.exe" ]; then
+      record_result "H3-heal" "PASS" "$bn 自愈成功（install.sh 补装 exe）" "plugin/claude-notifications-go@claude-notifications-go" "" "" "REPAIRED" "install.sh 自愈"
+      continue
+    fi
+    # 修复失败 → 残缺目录：双保险删除前再拷一次 CHANGELOG（Phase 3 orphan 抢救可能未覆盖非 orphan 目录）
     if [ -f "$v/CHANGELOG.md" ] && [ ! -f "$SNAP_DIR/evidence/orphan/$bn/CHANGELOG.md" ]; then
       mkdir -p "$SNAP_DIR/evidence/orphan/$bn"
       cp "$v/CHANGELOG.md" "$SNAP_DIR/evidence/orphan/$bn/"
@@ -890,6 +881,7 @@ fi
 echo ""
 echo "  日志: ~/.claude/update-all.log"
 echo "  提示: 更新完成后需重启 Claude Code daemon 使插件生效"
+echo "  提示: 更新前已运行的会话需重启或 /reload-plugins 才会加载新插件版本"
 echo "============================================================"
 
 echo "[$(date '+%H:%M:%S')] ===== update-all 完成: PASS=$PASS_COUNT FAIL=$FAIL_COUNT SKIP=$SKIP_COUNT =====" >> "$LOG_FILE"
@@ -918,7 +910,7 @@ echo "报告目录: $REPORT_DIR"
 1. **部分失败不阻断**：禁用 `set -e`；每命令立即 `rc=$?` 捕获（不用管道末端取码）；失败→FAILED + stderr 落盘，继续下一组件；Phase 5 报告不依赖任何组件成功。
 2. **版本解析降级链**：所有探测 one-liner 以 `2>/dev/null || true` 收尾；空输出→`unknown` + note 强制写原因；playwright-cli/claude 用行首锚定 `grep -oE '^[0-9]+\.[0-9]+\.[0-9]+' | head -1`。
 3. **git 类型判定兜底**：市场循环内先 `git -C "$d" rev-parse --git-dir` 判型，非 git 查 `.gcs-sha`，两者皆非记 unknown（未来新市场类型不炸流程）。
-4. **路径坑**：一切 cd 改子 shell（gstack setup、ECC install.sh 均 `bash -c 'cd ... && ...'`）；mattpocock 探测打 `.agents/skills/` 实体目录或 `find -L`；$SNAP 路径无空格。
+4. **路径坑**：一切 cd 改子 shell（gstack setup、ECC install.sh 均 `bash -c 'cd ... && ...'`）；$SNAP 路径无空格。
 5. **幂等**：Phase 0 纯只读；$SNAP 分钟级命名+冲突后缀；报告文件名冲突后缀；清理只动本技能自产物（过期快照）与既定残留（orphan/temp_git/副本）。
 6. **黑名单联动**：黑名单表、Phase 1 注释行、报告 §1 单列三处同步；claude-mem 完全不碰决策原文保留。
 
@@ -957,11 +949,9 @@ cd ~/.claude/skills/gstack && ./setup
 
 **修复**：激活版本一律查 `~/.claude/plugins/installed_plugins.json`（awk -F'"' 一行式见 `references/version-commands.md` §5）；缓存目录探测只回答"磁盘上有哪些版本"。
 
-### mattpocock 技能探测返回 0 个文件（v2.0.0 新增）
+### mattpocock 探测类故障（v2.1.0 已消除）
 
-**原因**：`<项目>/.claude/skills/<skill>` 是指向 `.agents/skills/<skill>` 的 symlink，find 默认不跟随 symlink（实测踩到）。
-
-**修复**：对 `<项目>/.agents/skills/<skill>` 实体目录 find，或加 `-L`。
+v2.1.0 起 mattpocock 走插件（`mattpocock-skills@mattpocock`），激活版本以 `installed_plugins.json` 为准，原「npx skills 探测返回 0 个文件」「lock 漂移判据」等坑随 S1 移除而消失。历史背景：`<项目>/.claude/skills/<skill>` 曾是指向 `.agents/skills/<skill>` 的 symlink，find 默认不跟随（2026-08-05 实测）。
 
 ### V- 复核 FAILED 但更新命令 exit 0（v2.0.0 新增）
 
@@ -980,6 +970,7 @@ cd ~/.claude/skills/gstack && ./setup
 ## 注意事项
 
 - 更新完成后需**重启 Claude Code daemon** 使插件生效（终端汇总中的提示与此条为同一事，交叉引用）
+- **更新前已运行的会话**不会自动加载新插件版本：需重启对应会话或在会话内 `/reload-plugins`（旧版本缓存目录在 Phase 4 清理，钉着旧路径的会话会丢失插件技能——2026-08-05 实测 superpowers/understand-anything 从会话中消失）
 - `specify-cli` 始终从 `github/spec-kit` 主分支安装最新开发版
 - `everything-claude-code` 已重构为 `ecc@ecc`，旧名不可用
 - 每个步骤的验证失败不会中断整体流程，但最终汇总与报告 §5/§6 会显示所有问题
@@ -994,6 +985,7 @@ cd ~/.claude/skills/gstack && ./setup
 |---|---|---|
 | `references/version-commands.md` | 登记表全部探测 one-liner + 2026-08-05 实测样例输出 + caveats | Phase 0/Phase 2 探测、故障排查 |
 | `references/evidence-guide.md` | 三级证据链表 + orphan 抢救 + 固定降级句 + 举例白名单 + 网络可选化规则 | Phase 3 证据采集 |
+| `references/plugin-pitfalls.md` | 插件 5 大坑（清单漏更新/死条目/市场撞名/commands 不随插件分发/安装≠可见）+ 检测与处置命令 | Phase 2 对账 WARN 处置、任何插件安装任务执行前 |
 | `references/report-template.md` | 报告 7 节完整模板 + 写作红线 + 落点命名与拆分规则 | Phase 5 撰写报告 |
 
 references 只放 Claude 阅读型指引；可执行 bash 代码一律留在本文件，执行时按需 Read。

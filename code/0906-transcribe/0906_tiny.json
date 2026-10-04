@@ -1,0 +1,267 @@
+{
+  "language": "zh",
+  "full_text": "小龙不久钱我们还在劉智能时ervbles dieser名字而追问的重点是中清晰如何让好用的AI成为人人可以用的铺汇生产力以人为本我们推动技术加速发展的走向原孙地产食智能机细而是有的大小的我以为是有的大小的我以为是有的大小的我以为是有的大小的大小的大小人孙地产食智能机细大模型无动突破思考并且知识馆成叶数据之会智能体购建高小之行网路AI无在指示工具王事从共生产力的心机应都被AI的买过律产业同平共争每个各位都在进场新闻的愿意每个个天都在感受智能的温度而此刻的浪潮如果是未来图景的第一当年以智围智这为了人机写同的无信可怒以人为重共复全球市场的破空天点一人被翻了是写人远道2020 唐讯全球数字生开大会",
+  "segments": [
+    {
+      "id": 0,
+      "start": 0.0,
+      "end": 2.0,
+      "text": "小龙",
+      "avg_logprob": -3.334,
+      "no_speech_prob": 0.2253
+    },
+    {
+      "id": 1,
+      "start": 20.64,
+      "end": 25.12,
+      "text": "不久钱",
+      "avg_logprob": -3.334,
+      "no_speech_prob": 0.2253
+    },
+    {
+      "id": 2,
+      "start": 25.68,
+      "end": 27.18,
+      "text": "我们还在劉智能时ervbles",
+      "avg_logprob": -3.334,
+      "no_speech_prob": 0.2253
+    },
+    {
+      "id": 3,
+      "start": 27.3,
+      "end": 28.08,
+      "text": "dieser名字",
+      "avg_logprob": -3.334,
+      "no_speech_prob": 0.2253
+    },
+    {
+      "id": 4,
+      "start": 28.08,
+      "end": 31.08,
+      "text": "而追问的重点是中清晰",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 5,
+      "start": 31.08,
+      "end": 33.08,
+      "text": "如何让好用的AI",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 6,
+      "start": 33.08,
+      "end": 37.08,
+      "text": "成为人人可以用的铺汇生产力",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 7,
+      "start": 37.08,
+      "end": 43.08,
+      "text": "以人为本我们推动技术加速发展的走向",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 8,
+      "start": 43.08,
+      "end": 47.08,
+      "text": "原孙地产食智能机细",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 9,
+      "start": 47.08,
+      "end": 49.08,
+      "text": "而是有的大小的",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 10,
+      "start": 49.08,
+      "end": 51.08,
+      "text": "我以为是有的大小的",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 11,
+      "start": 51.08,
+      "end": 52.08,
+      "text": "我以为是有的大小的",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 12,
+      "start": 52.08,
+      "end": 53.08,
+      "text": "我以为是有的大小的大小的大小",
+      "avg_logprob": -0.9096,
+      "no_speech_prob": 0.3029
+    },
+    {
+      "id": 13,
+      "start": 54.08,
+      "end": 57.08,
+      "text": "人孙地产食智能机细",
+      "avg_logprob": -0.533,
+      "no_speech_prob": 0.0536
+    },
+    {
+      "id": 14,
+      "start": 58.08,
+      "end": 62.08,
+      "text": "大模型无动突破思考并且",
+      "avg_logprob": -0.533,
+      "no_speech_prob": 0.0536
+    },
+    {
+      "id": 15,
+      "start": 64.08,
+      "end": 67.08,
+      "text": "知识馆成叶数据之会",
+      "avg_logprob": -0.533,
+      "no_speech_prob": 0.0536
+    },
+    {
+      "id": 16,
+      "start": 71.08,
+      "end": 75.08,
+      "text": "智能体购建高小之行网路",
+      "avg_logprob": -0.533,
+      "no_speech_prob": 0.0536
+    },
+    {
+      "id": 17,
+      "start": 76.08,
+      "end": 78.08,
+      "text": "AI无在指示工具",
+      "avg_logprob": -0.533,
+      "no_speech_prob": 0.0536
+    },
+    {
+      "id": 18,
+      "start": 79.08,
+      "end": 82.08,
+      "text": "王事从共生产力的心机应",
+      "avg_logprob": -0.533,
+      "no_speech_prob": 0.0536
+    },
+    {
+      "id": 19,
+      "start": 82.08,
+      "end": 84.08,
+      "text": "都被AI的买过",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 20,
+      "start": 84.08,
+      "end": 86.08,
+      "text": "律产业同平共争",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 21,
+      "start": 87.08,
+      "end": 91.08,
+      "text": "每个各位都在进场新闻的愿意",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 22,
+      "start": 92.08,
+      "end": 95.08,
+      "text": "每个个天都在感受智能的温度",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 23,
+      "start": 95.08,
+      "end": 97.08,
+      "text": "而此刻的浪潮",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 24,
+      "start": 97.08,
+      "end": 100.08,
+      "text": "如果是未来图景的第一当年",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 25,
+      "start": 101.08,
+      "end": 102.08,
+      "text": "以智围智",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 26,
+      "start": 102.08,
+      "end": 105.08,
+      "text": "这为了人机写同的无信可怒",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 27,
+      "start": 106.08,
+      "end": 110.08,
+      "text": "以人为重共复全球市场的破空天点",
+      "avg_logprob": -0.5606,
+      "no_speech_prob": 0.0245
+    },
+    {
+      "id": 28,
+      "start": 110.08,
+      "end": 113.08,
+      "text": "一人被翻了",
+      "avg_logprob": -0.722,
+      "no_speech_prob": 0.0887
+    },
+    {
+      "id": 29,
+      "start": 113.08,
+      "end": 114.08,
+      "text": "是",
+      "avg_logprob": -0.722,
+      "no_speech_prob": 0.0887
+    },
+    {
+      "id": 30,
+      "start": 114.08,
+      "end": 116.08,
+      "text": "写人远道",
+      "avg_logprob": -0.722,
+      "no_speech_prob": 0.0887
+    },
+    {
+      "id": 31,
+      "start": 118.08,
+      "end": 122.08,
+      "text": "2020 唐讯全球数字生开大会",
+      "avg_logprob": -0.722,
+      "no_speech_prob": 0.0887
+    }
+  ],
+  "stats": {
+    "segment_count": 32,
+    "low_confidence_count": 4,
+    "mean_avg_logprob": -1.0204
+  }
+}

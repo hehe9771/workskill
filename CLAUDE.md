@@ -13,3 +13,7 @@
 - **禁止在无任何明确指令时对组件进行升级或降级**（CLI、插件、npm 包、uv 工具、skills、marketplace 等）
 - 只有用户明确要求更新/升级/降级/安装/卸载时才执行；不得以"修复/优化/清理"名义擅自变更，判断需要时必须先说明并征得同意
 - 背景：2026-07-07 daemon 自动更新 claude-mem 留下残缺版本，hook 选错版本 + worker 不可达 + exit 1 阻断一切，环境完全崩溃
+
+## 插件安装经验
+
+- 插件安装/迁移/补装的操作记录与踩坑教训见 `doc/claude-code/插件安装与迁移记录.md`；防坑清单（市场撞名、commands 不随插件分发、启用≠安装、安装≠会话可见、清单对账）见 `.claude/skills/update-all/references/plugin-pitfalls.md`——安装类任务执行前先读，避免重复踩坑
